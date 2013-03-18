@@ -477,7 +477,6 @@ function createLine(obj){
 
   */
   var text = document.createElementNS(SVG,'text');
-  var translate
   storeShape('linetext', lineTextId, text);
 
   /* 
