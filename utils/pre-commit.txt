@@ -1,0 +1,8 @@
+#!/bin/sh
+
+which phantomjs > /dev/null|| exit 1
+(
+cd $(git rev-parse --show-toplevel)
+test -f tests/runner.js || exit 1
+phantomjs tests/runner.js tests/index.html || exit 1
+)

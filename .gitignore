@@ -1,1 +1,7 @@
 src/positions/*
+tests/qunit.js
+tests/runner.js
+tests/nv.*
+tests/ninja.*
+tests/gabe.*
+tests/README.md
