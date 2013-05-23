@@ -1,14 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
-
-Copyright (C) 2013 Toshikatsu Murakoshi <mtoshi.g@gmail.com>
-
-Licensed under the MIT (https://github.com/mtoshi/linkdraw/blob/master/LICENSE.md) license.
-
-"""
-
 import sys
 import os
 import json
@@ -32,4 +24,3 @@ if __name__ == "__main__":
     f = open(path, 'w')
     f.write(str)
     f.close()
-

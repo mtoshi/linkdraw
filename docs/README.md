@@ -4,8 +4,21 @@
 
 execute utils/setup.sh:
 
-	$ bash utils/setup.sh /path/to/linkdraw
+    $ bash utils/setup.sh /path/to/linkdraw
 
+## demo ##
+
+You can see linkdraw demo.
+
+This demo changes status of map automatically in seconds.
+
+Please execute "linkdraw_demo.py".
+
+    $ python utils/linkdraw_demo.py /path/to/linkdraw/configs/demo_config.json
+
+And access your web server.
+
+     http://......../demo.html
 
 ## setup of testing ##
 

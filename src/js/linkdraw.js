@@ -2,59 +2,24 @@
 
 Copyright (C) 2013 Toshikatsu Murakoshi <mtoshi.g@gmail.com>
 
-Licensed under the MIT (https://github.com/mtoshi/linkdraw/blob/master/LICENSE.md) license.
+Licensed the MIT (https://github.com/mtoshi/linkdraw/blob/master/LICENSE.md) license.
 
 */
 
-var DEBUG = true;
-var DEBUG = false;
 
-var SVG = 'http://www.w3.org/2000/svg';
-var XLINK = 'http://www.w3.org/1999/xlink';
+/* 
 
-var DEFAULT_SVG_WIDTH  = 4000;
-var DEFAULT_SVG_HEIGHT = 4000;
-var SVG_WIDTH;
-var SVG_HEIGHT;
-var DEFAULT_NODE_WIDTH  = 12;
-var DEFAULT_NODE_HEIGHT = 12;
-var DEFAULT_NODE_COLOR  = '#5F9EA0';
-var DEFAULT_NODE_LINK   = '';
-var DEFAULT_LINE_COLOR  = '#666';
-var DEFAULT_TEXT_COLOR  = '#333';
-var DEFAULT_FONT_SIZE   = 12;
+ global values
 
-var svg;
-var root;
-var nodes = {};
-var lines = {};
-var texts = {};
-var pairs = {};
-var positions = {};
-var lineCount = 0;
+*/
 
-//
-// for event
-//
-var dx, dy;
-var clickElement;
-var shapes = {
-  'node' : {}, 'line' : {} , 
-  'text' : {}, 'path' : {} ,
-  'textpath' : {}, 'linetext' : {} 
-};
+var linkdraw = {};
 
-//
-// configData
-//
-var viewSize;
-var nodeItem;
-var lineItem;
-var lineColorItem;
+/*
 
-//
-// console log for debug
-//
+  console log for debug
+
+*/
 (function () {
   if (typeof window.console === "undefined") {
     window.console = {}
@@ -64,94 +29,14 @@ var lineColorItem;
   }
 })();
 
-function mousemove_listener(evt) {
-  var t = 300;
-  var ex = evt.clientX + dx;
-  var ey = evt.clientY + dy;
+/*
 
-  // for node
-  var id = clickElement.ownerSVGElement.suspendRedraw(t);
-  var cid = clickElement.id;
-  clickElement.cx.baseVal.value = ex;
-  clickElement.cy.baseVal.value = ey;
-  clickElement.ownerSVGElement.unsuspendRedraw(id);
+  functions
 
-  var rx = parseInt(clickElement.getAttribute("rx"));
-  var ry = parseInt(clickElement.getAttribute("ry"));
+*/
 
-  var cid = clickElement.id;
-  var tid = createTextId(cid);
-
-  // for node name text
-  if (shapes['text'][tid]){
-    var text = shapes['text'][tid];
-    var id = text.ownerSVGElement.suspendRedraw(t);
-    var tp = textPositionAdujst(rx, ry, ex, ey);
-    text.setAttribute("x", tp.x);
-    text.setAttribute("y", tp.y);
-    text.ownerSVGElement.unsuspendRedraw(id);
-  }
-
-  if (nodes[cid]['line']) {
-    for (i=0; i<nodes[cid]['line'].length; i++) {
-
-      var lineId = nodes[cid]['line'][i];
-      var pathId = createPathId(lineId);
-      var textPathId = createTextPathId(lineId);
-      var lineTextId = createLineTextId(lineId);
-
-      var nodeAId = lines[lineId]['a'];
-      var nodeBId = lines[lineId]['b'];
-      var nodeA = shapes['node'][nodeAId];
-      var nodeB = shapes['node'][nodeBId];
-
-      var x1 = parseInt(nodeA.getAttribute("cx"));
-      var y1 = parseInt(nodeA.getAttribute("cy"));
-      var x2 = parseInt(nodeB.getAttribute("cx"));
-      var y2 = parseInt(nodeB.getAttribute("cy"));
-
-      var line = shapes['line'][lineId];
-      var path = shapes['path'][pathId];
-      var textPath = shapes['textpath'][textPathId];
-      var lineText = shapes['linetext'][lineTextId];
-
-      var num = lines[lineId]['number'];
-      var pairId = createPairId(nodeAId, nodeBId);
-      var maxNum = pairs[pairId].length;
-
-      var id = line.ownerSVGElement.suspendRedraw(t);
-      var points = createPoints(x1, y1, x2, y2, num, maxNum);
-      line.setAttribute('points', points);
-      line.ownerSVGElement.unsuspendRedraw(id);
-
-      id = path.ownerSVGElement.suspendRedraw(t);
-      var pathData = createPathData(x1, y1, x2, y2, num, maxNum);
-      path.setAttribute('d', pathData);
-      path.ownerSVGElement.unsuspendRedraw(id);
-
-      id = textPath.ownerSVGElement.suspendRedraw(t);
-      textPath.setAttribute("startOffset", '50%');
-      textPath.setAttribute('text-anchor', 'middle');
-      textPath.ownerSVGElement.unsuspendRedraw(id);
-      
-      id = lineText.ownerSVGElement.suspendRedraw(t);
-      lineText.ownerSVGElement.unsuspendRedraw(id);
-    }
-  }
-
-}
-
-function mouseup_listener(evt) {
-  document.removeEventListener("mousemove", mousemove_listener, true);
-  document.removeEventListener("mouseup", mouseup_listener, true);
-}
-
-function mousedown_listener(evt) {
-  clickElement = this;
-  dx = clickElement.cx.baseVal.value - evt.clientX;
-  dy = clickElement.cy.baseVal.value - evt.clientY;
-  document.addEventListener("mousemove", mousemove_listener, true);
-  document.addEventListener("mouseup", mouseup_listener, true);
+function cLog(x) {
+  if (linkdraw.debug) console.log(x);
 }
 
 function randNum(n){
@@ -164,200 +49,171 @@ function randNum(n){
   }
 }
 
-function storeShape(key, id, obj){
-  if (shapes[key]) {
-    shapes[key][id] = obj;
-  } else {
-    if (DEBUG) { console.log("[error] Could not store") };
-  }
-}
-
-function appendShape(key){
-  if (shapes[key]){
-    for (var i in shapes[key]){
-      svg.appendChild(shapes[key][i]);
+function createPositionData(filename){
+  var position = {};
+  var nodes = $("circle");
+  for (var i in nodes) {
+    var node = nodes[i];
+    var id = node.id;
+    if (id) {
+      var x = node.getAttribute("cx");
+      var y = node.getAttribute("cy");
+      position[id] = { "x": parseInt(x), "y": parseInt(y) };
     }
+  }
+  return { "file": filename , "data": { "position": position, "scale": linkdraw.scale, "translate": linkdraw.translate } }
+}
+
+function positionUpload(filename) {
+
+  var id = createSaveButtonId();
+
+  $("." + id).click(function(){
+
+    var json = createPositionData(filename);
+    var str = JSON.stringify(json);
+    cLog("# position save data #", JSON.parse(str));
+
+    $.ajax({
+      type: 'POST',
+      dataType:'text',
+      contentType: "application/json; charset=utf-8",
+      url: 'write.cgi',
+      async: true,
+      cache : false,
+      data: str,
+      success: function() {
+        cLog("json upload successed.");
+        alert("Position saved.");
+      },
+      error: function(jqXHR, textStatus, errorThrown){
+        cLog("json upload failed.");
+        cLog("status : " + textStatus);
+        cLog("text : " + jqXHR.responseText);
+      },
+      complete: function(){
+        cLog("json upload finished.");
+      }
+    });
+  });
+}
+
+function getJson(filename) {
+  var config = false;
+  $.ajax({
+    type: "GET",
+    dataType: "json",
+    async: false,
+    cache: false,
+    contentType: 'application/json',
+    url: filename,
+    success: function(data) {
+      var json = JSON.stringify(data);
+      config = JSON.parse(json)
+      cLog("ajax config load", config);
+    },
+    error: function () {
+      cLog("ajax config load error");
+      //alert('ajax config load error');
+    }
+  });
+
+  return config;
+}
+
+function getConfigData(filename) {
+
+  // first time
+  getJson(filename);
+
+  // after second
+  setInterval(function() {
+    getJson(filename);
+  }, 1000 * 10);
+}
+
+function lineIdFormat(str, source, target, n){
+  return str + "_" + source + "_" + target + "_" + n;
+}
+function createLineId(source, target, n){
+  return lineIdFormat("line", source, target, n);
+}
+function createLineTextId(source, target, n){
+  return lineIdFormat("linetext", source, target, n);
+}
+function createLineTextPathId(source, target, n){
+  return lineIdFormat("textpath", source, target, n);
+}
+function createLinePathId(source, target, n){
+  return lineIdFormat("path", source, target, n);
+}
+
+function createNodeGroupId(nodeName){
+  return "node_group_" + nodeName;
+}
+function createLineGroupId(lineId){
+  return "line_group_" + lineId;
+}
+function createNodeTextId(nodeName){
+  return "text_" + nodeName;
+}
+
+function createSaveButtonId(){
+  return "positionSave";
+}
+
+function createNodeTextPosition(x, y){
+  return { "x": x + 10, "y": y - 10 };
+}
+
+function defaultNodeConfig(){
+  return { "r":linkdraw.nodeR, "color":linkdraw.nodeColor, "link": "" };
+}
+
+function checkNode(id, nodes){
+  var n = nodes[id];
+  if (n){
+    return n;
   } else {
-    if (DEBUG) { console.log("[error] Could not append") };
+    return defaultNodeConfig();
   }
 }
 
-function textPositionAdujst(width, height, x, y) {
-  var tx = x + 10;
-  var ty = y - height/2 - 10;
-  return { 'x':tx, 'y':ty };
-}
-function createUpdate(update){
-  var ele = document.createElementNS(SVG, 'text');
-  ele.textContent = 'UPDATE ' + update;
-  ele.setAttribute('id', 'updateTime');
-  ele.setAttribute("fill", DEFAULT_TEXT_COLOR);
-  ele.setAttribute("font-size", DEFAULT_FONT_SIZE);
-
-  var x = svg.createSVGLength();
-  var y = svg.createSVGLength();
-  x.value = 10;
-  y.value = 20;
-  ele.x.baseVal.appendItem(x);
-  ele.y.baseVal.appendItem(y);
-  svg.appendChild(ele);
-}
-
-function createTextInfo(x, y, descr, fontSize, fontColor){
-  return { 
-    "descr" : descr,
-    "x" : x, "y" : y,
-    "fontSize" : fontSize, "fontColor" : fontColor,
-  };
-}
-
-function createLineColorChartInfo(id, x, y, width, height, color){
-  return { 
-    "id" : id,
-    "x" : x, "y" : y,
-    "width" : width, "height" : height,
-    "color" : color,
-  };
-}
-
-function getHashSize(obj){
-  var x = 0;
-  for (var i in obj) {
-    x++;
-  }
-  return x;
-}
-
-function createLineColorChart(colors){
-
-  var px = 10;
-  var py = 50;
-
-  var text = createTextInfo(px, py, "Line Colors", DEFAULT_FONT_SIZE, DEFAULT_TEXT_COLOR);
-  var ele = createText(text);
-  svg.appendChild(ele);
-
-  var len = getHashSize(colors);
-  var i = 0;
-  for (var key in colors) {
-    var descr = colors[key]["descr"];
-    var color = colors[key]["code"];
-    var id = "COLOR" + color;
-    var x = px;
-    var y = py + 20 * (len - i);
-    var width = 10;
-    var height = 20;
-
-    var rect = createLineColorChartInfo(id, x, y, width, height, color);
-    var ele = createRect(rect);
-    svg.appendChild(ele);
-
-    var text = createTextInfo(x + 12, y + 15, descr, DEFAULT_FONT_SIZE, DEFAULT_TEXT_COLOR);
-    var ele = createText(text);
-    svg.appendChild(ele);
-    i++;
+function getPosition(id){
+  var position = linkdraw.position;
+  var width  = linkdraw.width;
+  var height = linkdraw.height;
+  var p = position[id];
+  if (p){
+    return p;
+  } else {
+    var x = randNum(width);
+    var y = randNum(height);
+    position[id] = { "x": x, "y": y };
+    return position[id];
   }
 }
 
-function createRect(obj){
-  var id = obj['id'];
-  var x = obj['x'];
-  var y = obj['y'];
-  var width  = obj['width'];
-  var height = obj['height'];
-  var color  = obj['color'];
-  var ele = document.createElementNS(SVG, 'rect');
-  ele.setAttribute('x', x);
-  ele.setAttribute('y', y);
-  ele.setAttribute('width', width);
-  ele.setAttribute('height', height);
-  ele.setAttribute("fill", color);
-  return ele;
-}
-function createText(obj){
-  var ele = document.createElementNS(SVG, 'text');
-  var descr  = obj['descr'];
-  var x  = obj['x'];
-  var y  = obj['y'];
-  var fontSize = obj['fontSize'];
-  var fontColor = obj['fontColor'];
-  ele.textContent = descr;
-  ele.setAttribute("fill", fontColor);
-  ele.setAttribute("font-size", fontSize);
-
-  var sx = svg.createSVGLength();
-  var sy = svg.createSVGLength();
-  sx.value = x;
-  sy.value = y;
-
-  ele.x.baseVal.appendItem(sx);
-  ele.y.baseVal.appendItem(sy);
-  return ele;
+function getAngle(x1,y1,x2,y2){
+  var x = x2-x1;
+  var y = y2-y1;
+  return Math.atan2(y, x);
 }
 
-function createNode(obj){
-  var x = obj['x'];
-  var y = obj['y'];
-  var id = obj['id'];
-  var width  = obj['width']/2;
-  var height = obj['height']/2;
-  var color  = obj['color'];
-
-  // node ellipse
-  var ele = document.createElementNS(SVG, 'ellipse');
-  ele.setAttribute('id', id);
-  ele.setAttribute('cx', x);
-  ele.setAttribute('cy', y);
-  ele.setAttribute('rx', width);
-  ele.setAttribute('ry', height);
-  ele.setAttribute("fill", color);
-  ele.addEventListener("mousedown", mousedown_listener, false);
-  svg.appendChild(ele);
-  storeShape('node', id, ele);
-
-  // group
-  var g = document.createElementNS(SVG,'g');
-
-  // node text
-  var text = document.createElementNS(SVG, 'text');
-  var id = obj['id'];
-  var x  = obj['x'];
-  var y  = obj['y'];
-  var width  = obj['width'];
-  var height = obj['height'];
-  var tp = textPositionAdujst(width, height, x, y);
-  var tid = createTextId(id);
-  text.textContent = id;
-  text.setAttribute('id', tid);
-  text.setAttribute("fill", DEFAULT_TEXT_COLOR);
-  text.setAttribute("font-size", DEFAULT_FONT_SIZE);
-
-  var x = svg.createSVGLength();
-  var y = svg.createSVGLength();
-  x.value = tp.x;
-  y.value = tp.y;
-
-  text.x.baseVal.appendItem(x);
-  text.y.baseVal.appendItem(y);
-
-  storeShape('text', tid, text);
-
-  var url = obj['link'];
-  var a = addAnchor(text, url);
-
-  g.appendChild(a);
-  svg.appendChild(g);
+function getAngleAbs(x1,y1,x2,y2){
+  var x = Math.abs(x2-x1);
+  var y = Math.abs(y2-y1);
+  return Math.atan2(y, x);
 }
 
-function createTranslate(x, y){
-  return 'translate(' + x + ', ' + y + ')';
+function getPoint(len, rad){
+  var x = len*Math.cos(rad);
+  var y = len*Math.sin(rad);
+  return { "x": x, "y": y };
 }
 
-function createPathData(x1, y1, x2, y2, num, maxNum){
-  var pData = createPoints(x1, y1, x2, y2, num, maxNum);
-  return  "M " + pData;
-}
 function createMidlePoint(x1, y1, x2, y2, num, maxNum){
+
   var rad = getAngleAbs(x1,y1,x2,y2);
   var r;
 
@@ -379,9 +235,35 @@ function createMidlePoint(x1, y1, x2, y2, num, maxNum){
   var p = getPoint(len, r);
   var x = p.x + (x1+x2)/2;
   var y = p.y + (y1+y2)/2;
-  return { 'x':x, 'y':y }
+
+  return { "x": x, "y": y };
 }
-function createPoints(x1, y1, x2, y2, num, maxNum){
+
+function getXY(r, x1, y1, x2, y2) {
+  var rad = getAngle(x1,y1,x2,y2) / 2;
+  var ad = r * Math.cos(rad);
+  var bd = r * Math.sin(rad);
+  var x = ad * Math.cos(rad) - bd * Math.sin(rad);
+  var y = ad * Math.sin(rad) + bd * Math.cos(rad);
+  return { "x": x, "y": y };
+}
+
+function createPoints(r1, r2, x1, y1, x2, y2, num, maxNum){
+
+  var rad1 = getAngle(x1,y1,x2,y2) / 2;
+  var rad2 = getAngle(x2,y2,x1,y1) / 2;
+
+  var n1 = rad1 * r1;
+  var n2 = rad2 * r2;
+
+  p1 = getXY(r1, x1 + n1, y1 + n1, x2 + n2, y2 + n2);
+  p2 = getXY(r2, x2 + n2, y2 + n2, x1 + n1, y1 + n1);
+
+  x1 = p1.x + x1;
+  y1 = p1.y + y1;
+
+  x2 = p2.x + x2;
+  y2 = p2.y + y2;
 
   if (maxNum == 1){
     return  x1 + "," + y1 +  " " + x2 + "," + y2;
@@ -391,410 +273,1034 @@ function createPoints(x1, y1, x2, y2, num, maxNum){
   }
 }
 
-function addAnchor(obj, link){
-  var ele = document.createElementNS(SVG, "a");
-  ele.setAttributeNS(XLINK, "href", link);
-  ele.appendChild(obj);
-  return ele;
+function createPathData(r1, r2, x1, y1, x2, y2, num, maxNum){
+  var pData = createPoints(r1, r2, x1, y1, x2, y2, num, maxNum);
+  return  "M " + pData;
 }
 
-function getAngleDeg(x1,y1,x2,y2){
-  var r = getAngle(x1,y1,x2,y2);
-  return r/(Math.PI/360);
-}
-function getAngle(x1,y1,x2,y2){
-  x = x2-x1;
-  y = y2-y1;
-  return Math.atan2(y, x);
-}
-function getAngleAbs(x1,y1,x2,y2){
-  x = Math.abs(x2-x1);
-  y = Math.abs(y2-y1);
-  return Math.atan2(y, x);
-}
 
-function getPoint(len, rad){
-  var x = len*Math.cos(rad);
-  var y = len*Math.sin(rad);
-  return { 'x':x, 'y':y };
-}
-
-function createLine(obj){
-
-  var lineId = obj['id'];
-  var nodeA  = obj['a'];
-  var nodeB  = obj['b'];
-  var width  = obj['width'];
-  var color  = obj['color'];
-  var descr  = obj['descr'];
-  var url    = obj['link'];
-  var num    = obj['number'];
-  var x1     = nodes[nodeA]['x'];
-  var y1     = nodes[nodeA]['y'];
-  var x2     = nodes[nodeB]['x'];
-  var y2     = nodes[nodeB]['y'];
-
-  var pathId = createPathId(lineId);
-  var textPathId = createTextPathId(lineId);
-  var lineTextId = createLineTextId(lineId);
-  var pairId = createPairId(nodeA, nodeB);
-  var maxNum = pairs[pairId].length;
-
-  var g = document.createElementNS(SVG,'g');
-  g.setAttribute('fill', '#000');
-  g.setAttribute('font-size', DEFAULT_FONT_SIZE);
-  g.setAttribute("font-family", 'monospace');
-
-  /* 
-
-  path
-
-  */
-  var path = document.createElementNS(SVG,'path');
-  var pData = createPathData(x1, y1, x2, y2, num, maxNum);
-  path.setAttribute('id', pathId);
-  path.setAttribute('d', pData);
-  path.setAttribute('fill', 'none');
-  path.setAttribute('stroke-width', width);
-  path.setAttribute("opacity", 1);
-  g.appendChild(path);
-  storeShape('path', pathId, path);
-
-  /* 
-
-  text
-
-  */
-  var text = document.createElementNS(SVG,'text');
-  storeShape('linetext', lineTextId, text);
-
-  /* 
-
-  textPath
-
-  */
-  var textPath = document.createElementNS(SVG,'textPath');
-  textPath.setAttributeNS(XLINK, 'href', '#' + pathId);
-  textPath.textContent = descr;
-  textPath.setAttribute("startOffset", '50%');
-  textPath.setAttribute('text-anchor', 'middle');
-  text.appendChild(textPath);
-  g.appendChild(addAnchor(text, url));
-  storeShape('textpath', textPathId, textPath);
-
-  var line = document.createElementNS(SVG, 'polyline');
-  var points = createPoints(x1, y1, x2, y2, num, maxNum);
-  line.setAttribute('points', points);
-  line.setAttribute('id', lineId);
-  line.setAttribute('fill', 'none');
-  line.setAttribute("stroke", color);
-  line.setAttribute("stroke-width", width);
-  g.appendChild(line);
-
-  storeShape('line', lineId, line);
-  svg.appendChild(g);
-
-}
-
-function createNodes(){
-  if (DEBUG) { console.log("create node") };
-  for (var i in nodes) {
-    createNode(nodes[i]);
+function sortPairDirection(pairs, source, target) {
+  // for already A - B
+  var bool = isAlreadyPair(pairs, source, target);
+  if (bool) {
+    return { "source": source, "target": target };
   }
+  // for already B - A
+  var bool = isAlreadyPair(pairs, target, source);
+  if (bool) {
+    return { "source": target, "target": source };
+  }
+  // not found
+  return { "source": source, "target": target };
 }
-function createLines(){
-  if (DEBUG) { console.log("create line") };
-  for (var i in lines) {
-    createLine(lines[i]);
+
+function isAlreadyPair(pairs, a, b) {
+  if (pairs[a]){
+    if (pairs[a][b]){
+      return true; 
+    }
+  }
+  return false; 
+}
+
+function addPair(obj, source, target, line) {
+  if (obj[source]) {
+    if (obj[source][target]) {
+      obj[source][target].push(line);
+    } else {
+      obj[source][target] = [ line ];
+    }
+  } else {
+    obj[source] = {};
+    obj[source][target] = [ line ];
   }
 }
 
-function createLineId(){
-  lineCount++;
-  return 'LINE' + lineCount;
-}
-function createTextId(nodeName){
-  return 'TEXT' + '_' + nodeName;
-}
-function createLineTextId(lineId){
-  return lineId + '_' + 'LINETEXT';
-}
-function createPathId(lineId){
-  return lineId + '_' + 'PATH';
-}
-function createTextPathId(lineId){
-  return lineId + '_' + 'TEXTPATH';
-}
-function createPairId(nameA, nameB){
-  return nameA + nameB;
+function addNodeLineBind(obj, nodeName, line) {
+  if (obj[nodeName]){
+    obj[nodeName].push(line);
+  } else {
+    obj[nodeName] = [ line ];
+  }
 }
 
-function checkPair(nameA, nameB){
-  // case of already "A - B"
-  var pairId = createPairId(nameA, nameB);
-  if (pairs[pairId]) {
-    return { 'a': nameA, 'b' : nameB }
+function transformView() {
+  d3.selectAll("g.nodeGroup")
+    .attr("transform", "translate(" + linkdraw.translate + ")" + " scale(" + linkdraw.scale + ")");
+  d3.selectAll("g.lineGroup")
+    .attr("transform", "translate(" + linkdraw.translate + ")" + " scale(" + linkdraw.scale + ")");
+}
+
+function zoomRate() {
+  if (linkdraw.scale >= 1){
+    return 1;
+  } else {
+    return 1 + 1 - linkdraw.scale;
+  }
+}
+
+function makeLineColors(colors) {
+  obj = {};
+  for (var i in colors) {
+    id    = colors[i].id;
+    color = colors[i].color;
+    obj[id] = color;
+  }
+  return obj;
+}
+function lineColorSelect(color, lineColors) {
+
+  if (color.match(/#/)) {
+    return color;
+  } else if (lineColors[color]) {
+    return lineColors[color];
+  } else {
+    return linkdraw.lineColor;
+  }
+}
+
+function randNumForNoCache() {
+  return parseInt((new Date)/1000);
+}
+
+function initPositionData(obj) {
+  var x = obj["position"];
+  if (x) {
+    return x;
+  } else {
+    return {};
+  }
+}
+
+function initScaleData(obj) {
+  var x = obj["scale"];
+  if (x) {
+    return x;
+  } else {
+    return 1;
+  }
+}
+
+function initTranslateData(obj) {
+  var x = obj["translate"];
+  if (x) {
+    return x;
+  } else {
+    return [ 0, 0 ];
+  }
+}
+
+function initConfigData(obj) {
+  if (obj) {
+    return obj;
+  } else {
+    return { 
+      "time": "",
+      "descr": "",
+      "lineColors": [],
+      "nodes": [],
+      "lines": []
+    };
+  }
+}
+
+function parseNodeConfig(nodes) {
+  var x = {};
+  for (var i=0; i<nodes.length; i++) {
+    var node = nodes[i];
+    x[node.name] = node;
+  }
+  return x;
+}
+
+function getPairLength(pairs, s, t) {
+  if (pairs[s]) {
+    if (pairs[s][t]) {
+      return pairs[s][t].length;
+    }
+  }
+  return 0;
+}
+function addLineConfigItem(hash, s, t, lines) {
+
+  if (hash[s]) {
+    if (hash[s][t]) {
+      hash[s][t].concat(lines);
+    } else {
+      hash[s][t] = lines;
+    }
+  } else {
+    hash[s] = {};
+    hash[s][t] = lines;
+  }
+  return hash;
+}
+
+function lineConfigVals(mod, add, del) {
+   return { "mod": mod, "add": add, "del": del };
+}
+
+function getLineConfigDiff(linesNew, linesOld, pairsNew, pairsOld) {
+
+  //var item = {};
+  var addItem = {};
+  var modItem = {};
+  var delItem = {};
+
+  for (var s in pairsNew) {
+    for (var t in pairsNew[s]) {
+
+      var lines = pairsNew[s][t];
+      var oldLen = getPairLength(pairsOld, s, t);
+      var newLen = getPairLength(pairsNew, s, t);
+
+      // only mod
+      if (oldLen == newLen) {
+        modItem = addLineConfigItem(modItem, s, t, lines);
+
+      // add new line
+      } else if (oldLen < newLen) {
+        var _lines = lines.slice(0, oldLen);
+        modItem = addLineConfigItem(modItem, s, t, _lines);
+        var _lines = lines.slice(oldLen, newLen);
+        addItem = addLineConfigItem(addItem, s, t, _lines);
+      }
+    }
   }
 
-  // case of already "B - A"
-  pairId = createPairId(nameB, nameA);
-  if (pairs[pairId]) {
-    return { 'a': nameB, 'b' : nameA }
+  // for deleted line (old exsisted line)
+  for (var s in pairsOld) {
+    for (var t in pairsOld[s]) {
+
+      var lines = pairsOld[s][t];
+      var oldLen = getPairLength(pairsOld, s, t);
+      var newLen = getPairLength(pairsNew, s, t);
+
+      // delete all line
+      if ((oldLen > 0 ) && (newLen == 0)) {
+        delItem = addLineConfigItem(delItem, s, t, lines);
+
+      // delete line
+      } else if (oldLen > newLen) {
+        var newLines = pairsNew[s][t];
+        var _lines = newLines.slice(0, newLen);
+        modItem = addLineConfigItem(modItem, s, t, _lines);
+        var _lines = lines.slice(newLen, oldLen);
+        delItem = addLineConfigItem(delItem, s, t, _lines);
+      }
+    }
   }
 
-  // case of none 
-  return { 'a': nameA, 'b' : nameB }
+  return { "add": addItem, "mod": modItem, "del": delItem }
   
 }
 
-function addPair(nameA, nameB, lineId){
-  // A-B
-  var pairId = createPairId(nameA, nameB);
-  if (pairs[pairId]) {
-    pairs[pairId].push(lineId);
-  } else {
-    pairs[pairId] = [ lineId ];
+function updateTime(svg, time) {
+
+  var id = "time";
+
+  // delete time
+  d3.select("text#" + id).remove();
+
+  // create time
+  createText(svg, id, time, "10", "20");
+}
+
+function updateDescr(svg, descr) {
+
+  var id = "descr";
+
+  // delete descr
+  d3.select("text#" + id).remove();
+
+  // create descr
+  createText(svg, id, descr, "10", "40");
+}
+
+function modLine(lines) {
+
+  for (var i=0; i<lines.length; i++) {
+
+    var line = lines[i];
+    var lineId       = line.lineId;
+    var pathId       = line.pathId;
+    var textPathId   = line.textPathId;
+    var lineTextId   = line.lineTextId;
+
+    // position
+    var pathData = line.pathData;
+    var points   = line.points;
+
+    // color
+    var lineColor = line.color;
+
+    // width
+    var lineWidth = line.width;
+
+    // descr
+    var lineDescr = line.descr;
+
+    // change polyline
+    d3.select("polyline#" + lineId)
+      .attr("points", points)
+      .style("stroke-width", lineWidth)
+      .style("stroke", lineColor);
+
+    // change path
+    d3.select("path#" + pathId)
+      .attr("d", pathData);
+
+    /*
+      d3.js could not get "textPath" element. 
+      So this setting uses jQuery. (2013/04/28)
+    
+      d3.select("textPath#" + textPathId)
+        .text(lineDescr);
+    */
+    $("#" + textPathId).text(lineDescr);
+      //.attr("startOffset", "50%")
+      //.attr("text-anchor", "middle");
+      //.attr("text", lineDescr);
+
+    // change line style
+    d3.select("text#" + lineTextId)
+      .attr("x", "")// for Safari 5.1.7
+      .attr("y", "")// for Safari 5.1.7
+      .attr("startOffset", "50%") // for Safari 5.1.7
+      .attr("text-anchor", "middle") // for Safari 5.1.7
+      .style("fill", lineColor)
+      .style("color", lineColor);
+
   }
-  return pairs[pairId].length;
 }
+function addLine(svg, lines) {
+  createLine(svg, lines);
+}
+function delLine(svg, lines) {
 
-/*
- 
-  view size
- 
-*/
-function addViewSize(obj){
-  if (obj){
-    SVG_WIDTH  = obj['width'];
-    SVG_HEIGHT = obj['height'];
-  } else {
-    SVG_WIDTH  = DEFAULT_SVG_WIDTH;
-    SVG_HEIGHT = DEFAULT_SVG_HEIGHT;
+  for (var i=0; i<lines.length; i++) {
+
+    var line = lines[i];
+    var lineId      = line.lineId;
+    var pathId      = line.pathId;
+    var textPathId  = line.textPathId;
+    var lineTextId  = line.lineTextId;
+    var lineGroupId = line.lineGroupId;
+
+    var lineColor = line.color;
+    var lineDescr = line.descr;
+
+    // del group
+    d3.select("g#" + lineGroupId).remove();
+
+    // del line text
+    d3.select("text#" + lineTextId).remove();
+
+    /*
+      d3.js could not get "textPath" element. 
+      So this setting uses jQuery. (2013/04/28)
+    
+      d3.select("textPath#" + textPathId)
+        .text(lineDescr);
+    */
+    $("textPath#" + textPathId).remove();
+
+    // del polyline
+    d3.select("polyline#" + lineId).remove();
   }
 
-
-  // for svg size
-  root.setAttribute('width', SVG_WIDTH);
-  root.setAttribute('height', SVG_HEIGHT);
-  svg.setAttribute('width', SVG_WIDTH);
-  svg.setAttribute('height', SVG_HEIGHT);
-
-  // for css
-  root.style.width  = SVG_WIDTH + 'px';
-  root.style.height = SVG_HEIGHT + 'px';
 }
 
-/*
+function updateLine(svg, lineItems){
+  var addItem = lineItems.add;
+  var modItem = lineItems.mod;
+  var delItem = lineItems.del;
+
+  // del
+  for (var s in delItem) {
+    for (var t in delItem[s]) {
+      var lines = delItem[s][t];
+      delLine(svg, lines);
+    }
+  }
+
+  // mod
+  for (var s in modItem) {
+    for (var t in modItem[s]) {
+      var lines = modItem[s][t];
+      modLine(lines);
+    }
+  }
+
+  // add
+  for (var s in addItem) {
+    for (var t in addItem[s]) {
+      var lines = addItem[s][t];
+      addLine(svg, lines);
+    }
+  }
  
-  content update time
- 
-*/
-function addUpdate(update){
-  if (update){
-    createUpdate(update);
+}
+
+function getNodeConfigDiff(nodeOld, nodeNew) {
+  var addItem = {};
+  var delItem = {};
+  var modItem = {};
+
+  // Add and Mod check
+  for (var i in nodeNew) {
+    if (nodeOld[i]) {
+      modItem[i] = nodeNew[i];
+    } else {
+      addItem[i] = nodeNew[i];
+    }
+  }
+
+  // Delete check
+  for (var i in nodeOld) {
+    if (nodeNew[i]) {
+      // mod
+    } else {
+      delItem[i] = nodeOld[i];
+    }
+  }
+
+  cLog("### node config diff add ###", addItem);
+  cLog("### node config diff del ###", delItem);
+  cLog("### node config diff mod ###", modItem);
+
+  return { "add":addItem, "del":delItem, "mod":modItem };
+}
+
+function addNode(svg, nodes, drag) {
+
+  // add new node
+  createNode(svg, nodes, drag);
+
+}
+
+function delNode(svg, nodes) {
+
+  for (var id in nodes) {
+
+    // del group
+    var groupId = createNodeGroupId(id);
+    d3.select("g#" + groupId).remove();
+
+    // del circle
+    d3.select("circle#" + id).remove();
+
+    // del text 
+    var textId = createNodeTextId(id);
+    d3.select("text#" + textId).remove();
+
   }
 }
 
-/*
- 
-  content color chart
+function modNode(svg, nodes) {
 
- */
-function addColorChart(colors){
-  if (colors){
-    createLineColorChart(colors);
+  for (var id in nodes) {
+
+    var node = nodes[id];
+    var p = getPosition(id);
+    var r = node.r;
+
+    // mod circle
+    var node = nodes[id];
+    d3.select("circle#" + id)
+      .style("stroke", node.color)
+      .style("fill", node.color)
+      .attr("r", node.r);
+
+    // mod text 
+    var textId = createNodeTextId(id);
+    d3.select("text#" + textId)
+      .attr("xlink:href", node.link)
+      .style("color", linkdraw.fontColor)
+      .style("font-size", linkdraw.fontSize)
+      .style("font-weight", linkdraw.fontWeight)
+      .style("font-family", linkdraw.fontFamily)
+      .text(id);
   }
 }
 
-/*
- 
-
-  Add line info to lines hash.
-  Line id is sequential.
-
-*/
-function addLineInfo(id, nNameA, nNameB, color, width, descr, link, lineNum){
-  lines[id] = { 'id' : id, 'a' : nNameA, 'b': nNameB, 'color' : color, 'width' : width, 'descr': descr, 'link' : link, 'number' : lineNum };
+function updateNode(svg, item, drag) {
+  addNode(svg, item.add, drag);
+  delNode(svg, item.del);
+  modNode(svg, item.mod);
 }
 
+function createSVG(id){
 
-/*
+  var width  = linkdraw.width;
+  var height = linkdraw.height;
 
-  Add specified node to nodes hash.
-  Node id is 'hostname'.
-  Also each node has line id list for drag event.
+  d3.select(id)
+    .style("width", width + "px")
+    .style("height", height + "px")
+    .style("background-color", "#FFF")
+    .style("margin-top", "12px")
+    .style("margin-left", "auto")
+    .style("margin-right", "auto")
+    .style("margin-bottom", "12px");
 
-*/
-function addNode(nName, width, height, color, link){
-  var x;
-  var y;
-  if (positions) {
-    if (positions[nName]) {
-      if (positions[nName]['x'] && positions[nName]['y']) {
-        x = positions[nName]['x'];
-        y = positions[nName]['y'];
+  var svg = d3.select(id)
+    .append("svg")
+      .style("version", "1.1")
+      .style("overflow", "hidden")
+      .style("position", "relative")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", "0 0 " + width + " " + height);
+
+  return svg
+}
+
+function createSaveButton(svg, positionPath) {
+
+  var x = 10;
+  var y = 60;
+  var width = 100;
+  var height = 20;
+  var leftSpace = 10;
+  var id = createSaveButtonId();
+
+  svg.append("rect")
+    .attr("class", id)
+    .attr("width", width + "px")
+    .attr("height", height + "px")
+    .attr("x", x + "px")
+    .attr("y", y + "px")
+    .on("click", positionUpload(positionPath))
+    .attr("rx", "4px")
+    .attr("ry", "4px")
+    .attr("stroke", "#004666")
+    .attr("fill", "#00688B");
+  svg.append("text")
+    .attr("class", id)
+    .attr("x", width / 2 + leftSpace + "px")
+    .attr("y", y + height - 4 + "px")
+    //.attr("pointer-events", "none")
+    .attr("startOffset", "50%")
+    .attr("text-anchor", "middle")
+    .style("fill", "#FFF")
+    .style("font-size", linkdraw.fontSize)
+    .style("font-weight", linkdraw.fontWeight)
+    .style("font-family", linkdraw.fontFamily)
+    .on("click", positionUpload(positionPath))
+    .text("Position Save");
+
+}
+
+function createText(svg, id, update, x, y) {
+  if (update) {
+    svg.append("text")
+      .attr("id", id)
+      .attr("x", x + "px")
+      .attr("y", y + "px")
+      .style("fill", linkdraw.fontColor)
+      .style("font-size", linkdraw.fontSize)
+      .style("font-weight", linkdraw.fontWeight)
+      .style("font-family", linkdraw.fontFamily)
+      .text(update);
+  }
+}
+
+function updateLineColorChart(svg, colors, lineColors) {
+
+  // padding
+  var padding_left = 10;
+
+  // html class for remove and create 
+  var class_rect = "color_chart_rect";
+  var class_text = "color_chart_text";
+
+  // color box height and width
+  var color_chart_box_height = 20;
+  var color_chart_box_width  = 100;
+
+  // remove
+  d3.selectAll("." + class_text).remove();
+  d3.selectAll("." + class_rect).remove();
+
+  // create
+  if (colors) {
+    for (var i in colors) {
+      var y = color_chart_box_height * i + 80;
+      var _y = y + 4; // for padding bottom
+      svg.append("rect")
+        .attr("class", class_rect)
+        .attr("width", color_chart_box_width + "px")
+        .attr("height", color_chart_box_height + "px")
+        .attr("x", padding_left + "px")
+        .attr("y", _y + "px")
+        .attr("fill", colors[i].color);
+
+      _y = y + color_chart_box_height;
+      svg.append("text")
+        .attr("class", class_text)
+        .attr("x", color_chart_box_width / 2 + padding_left + "px")
+        .attr("y", _y + "px")
+        .attr("startOffset", "50%")
+        .attr("text-anchor", "middle")
+        .style("font-size", linkdraw.fontSize)
+        .style("font-weight", linkdraw.fontWeight)
+        .style("font-family", linkdraw.fontFamily)
+        .style("fill", "#FFF")
+        .text(colors[i].descr);
+    }
+    cLog("# color check", colors);
+  }
+}
+
+function createLine(svg, lines) {
+
+  for (var i=0;i<lines.length;i++) {
+
+    var line = lines[i];
+
+    // id
+    var id          = line.id;
+    var lineId      = line.lineId;
+    var pathId      = line.pathId;
+    var textPathId  = line.textPathId;
+    var lineTextId  = line.lineTextId;
+    var lineGroupId = line.lineGroupId;
+
+    // position
+    var pathData = line.pathData;
+    var points   = line.points;
+
+    // color
+    var lineColor = line.color;
+
+    // width
+    var lineWidth = line.width;
+
+    var lineGroup = svg.append("g")
+      .attr("id", lineGroupId)
+      .attr("class", "lineGroup")
+      .style("fill", "none");
+
+    lineGroup.append("path")
+      .attr("id", pathId)
+      .attr("d", pathData);
+
+    lineGroup.append("a")
+      .attr("xlink:href", line.link)
+      .append("text")
+      .attr("id", lineTextId)
+      .style("fill", lineColor)
+      .style("color", lineColor)
+      .style("font-size", linkdraw.fontSize)
+      .style("font-weight", linkdraw.fontWeight)
+      .style("font-family", linkdraw.fontFamily)
+      .append("textPath")
+      .attr("id", textPathId)
+      .attr("xlink:href", "#" + pathId)
+      .attr("startOffset", "50%")
+      .attr("text-anchor", "middle")
+      .text(line.descr);
+
+    lineGroup.append("polyline")
+      .attr("id", lineId)
+      .style("stroke-linecap", "round")
+      .style("stroke", lineColor)
+      .style("opacity", 1.0)
+      .style("stroke-width", lineWidth)
+      .attr("points", points);
+  }
+}
+
+function createNode(svg, nodes, drag) {
+
+  for (var id in nodes) {
+    var node = nodes[id];
+    var textId = createNodeTextId(id);
+    var groupId = createNodeGroupId(id);
+    var p = getPosition(id);
+    var r = node.r;
+    var nodeTextPosition = createNodeTextPosition(p.x, p.y);
+
+    var nodeGroup = svg.append("g")
+      .attr("id", groupId)
+      .attr("class", "nodeGroup");
+
+    nodeGroup.append("circle")
+      .style("stroke", node.color)
+      .style("fill", node.color)
+      .style("fill-opacity", 0.6)
+      .attr("id", id)
+      .attr("cx", p.x)
+      .attr("cy", p.y)
+      .attr("r", r)
+      .call(drag);
+
+    nodeGroup.append("a")
+      .attr("xlink:href", node.link)
+      .append("text")
+      .attr("id", textId)
+      .attr("x", nodeTextPosition.x)
+      .attr("y", nodeTextPosition.y)
+      .style("color", linkdraw.fontColor)
+      .style("font-size", linkdraw.fontSize)
+      .style("font-weight", linkdraw.fontWeight)
+      .style("font-family", linkdraw.fontFamily)
+      .text(id);
+  }
+
+}
+
+function getLineNumber(pairs, a, b) {
+  if (pairs[a]){
+    if (pairs[a][b]){
+      return pairs[a][b].length;
+    }
+  }
+  return 0;
+}
+
+function makePairs(lines, lineColors) {
+
+  var pairs = {};
+
+  for (var i=0;i<lines.length;i++) {
+
+    var line = lines[i];
+    var source = line.source;
+    var target = line.target;
+
+    var pair = sortPairDirection(pairs, source, target);
+    source = pair.source;
+    target = pair.target;
+
+    // rest source and target
+    line.source = source;
+    line.target = target;
+
+    // each span(node span) line count
+    var n = getLineNumber(pairs, source, target);
+
+    // append id
+    var id          = i;
+    var lineId      = createLineId(source, target, n);
+    var pathId      = createLinePathId(source, target, n);
+    var textPathId  = createLineTextPathId(source, target, n);
+    var lineTextId  = createLineTextId(source, target, n);
+    var lineGroupId = createLineGroupId(lineId);
+    line.id          = id;
+    line.lineId      = lineId;
+    line.pathId      = pathId;
+    line.textPathId  = textPathId;
+    line.lineTextId  = lineTextId;
+    line.lineGroupId = lineGroupId;
+
+    // append color
+    var lineColor = lineColorSelect(line.color, lineColors);
+    line.color = lineColor;
+
+    // add pair to pairs obj
+    addPair(pairs, source, target, line);
+
+  }
+  cLog("# config lines #", lines);
+
+  return pairs;
+}
+
+function initNodeConfig(nodes, pairs) {
+  for (var source in pairs) {
+    for (var target in pairs[source]) {
+      nodes[source] = checkNode(source, nodes);
+      nodes[target] = checkNode(target, nodes);
+    }
+  }
+  return nodes;
+}
+
+function makeBind(lines) {
+
+  var bind = {};
+
+  for (var i=0;i<lines.length;i++) {
+    var line = line[i];
+    var source = line.source;
+    var target = line.target;
+    // add source node and line binding
+    addNodeLineBind(bind, source, line);
+    
+    // add target node and line binding
+    addNodeLineBind(bind, target, line);
+  }
+
+  return bind;
+}
+
+function appendPosition() {
+
+  var pairs = linkdraw.pairs;
+  var nodes = linkdraw.nodes;
+
+  for (var source in pairs) {
+    for (var target in pairs[source]) {
+      var lines = pairs[source][target];
+      for (var i=0; i<lines.length;i++) {
+
+        var line = lines[i];
+        var r1 = nodes[source].r;
+        var r2 = nodes[target].r;
+        var p1 = getPosition(source);
+        var p2 = getPosition(target);
+        var lineNumber = i + 1;
+        var lineNumberMax = lines.length;
+        var pathData = createPathData(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
+        var points = createPoints(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
+
+        cLog("# ----------------- #", "");
+        cLog("# lineNumber #", lineNumber);
+        cLog("# lineNumberMax #", lineNumberMax);
+        cLog("# path data #", pathData);
+        cLog("# point data #", points);
+
+        // store 
+        line["pathData"] = pathData;
+        line["points"]   = points;
+        pairs[source][target][i] = line;
+
       }
     }
   }
-  if ( !x || !y ) {
-    x = randNum(SVG_WIDTH);
-    y = randNum(SVG_HEIGHT);
-  }
-  nodes[nName] = { 'id' : nName, 'x' : x, 'y' : y, 'width' : width, 'height' : height, 'color' : color, 'link' : link, 'line' : [] };
 }
 
-/*
-
-  Add line and store line info to node.
-  Also, add default node to nodes hash. 
-  (Default node is not specified node.)
-  We can get line information from drag element for redraw element and element's lines.
-
-*/
-function addLine(nNameA, nNameB, color, width, descr, link){
-
-  /*
-
-  This line system configuration has 2 pattern.
-
-  A - B or B -A
-
-  At the first, make a choice 1 pattern.
-
-  */
-
-  var cp = checkPair(nNameA, nNameB);
-  nNameA = cp['a'];
-  nNameB = cp['b'];
-
-  /*
-
-  Store  each line information. 
-
-  */
-
-  var lineId = createLineId();
-  var pairId = createPairId(nNameA, nNameB);
-  var lineNum = addPair(nNameA, nNameB, lineId);
-
-
-  addLineInfo(lineId, nNameA, nNameB, color, width, descr, link, lineNum);
-
-  /*
-
-  for Node A
-  Make default node and store line id.
-
-  */
-  if ( !nodes[nNameA] ){
-    addNode(nNameA, DEFAULT_NODE_WIDTH, DEFAULT_NODE_HEIGHT, DEFAULT_NODE_COLOR, DEFAULT_NODE_LINK);
-  }
-  nodes[nNameA]['line'].push(lineId);
-
-  /*
-
-  for Node B
-  Make default node and store line id.
-
-  */
-  if ( !nodes[nNameB] ){
-    addNode(nNameB, DEFAULT_NODE_WIDTH, DEFAULT_NODE_HEIGHT, DEFAULT_NODE_COLOR, DEFAULT_NODE_LINK);
-  }
-  nodes[nNameB]['line'].push(lineId);
+function zoomEvent(svg) {
+  svg.call(d3.behavior.zoom()
+    .on("zoom", function redraw() {
+      linkdraw.scale = d3.event.scale;
+      linkdraw.translate = d3.event.translate;
+      transformView();
+    })
+  );
 }
 
-function createPositionData(filename){
-  var positions = {};
-  for (var i in shapes['node']) {
-    var node = shapes['node'][i];
-    var id = node.getAttribute('id');
-    var x  = node.getAttribute('cx');
-    var y  = node.getAttribute('cy');
-    positions[id] = { "x": parseInt(x), "y": parseInt(y) };
-  }
-  return { "file": filename , "data": { "position": positions } }
-}
+function dragEvent() {
+  return d3.behavior.drag()
+    .on("drag", function() {
 
-function getColor(colors, x){
-  if (x.match(/#[0-9a-f]+/i)){
-    return x;
-  } else {
-    if (colors){
-      var color = colors[x];
-      if (color){
-        return color["code"];
+      var pairs = linkdraw.pairs;
+      var nodes = linkdraw.nodes;
+      var dx, dy; 
+      var id = this.id;
+      var zRate = zoomRate();
+
+      if (zRate < 1) {
+        dx = this.cx.baseVal.value + d3.event.dx * (zRate);
+        dy = this.cy.baseVal.value + d3.event.dy * (zRate);
+      } else {
+        dx = this.cx.baseVal.value + d3.event.dx;
+        dy = this.cy.baseVal.value + d3.event.dy;
       }
-    }
-    return DEFAULT_LINE_COLOR;
-  }
+      d3.select(this)
+        .attr('cx', dx)
+        .attr('cy', dy);
+      cLog("node position",  id);
+
+      var textId = createNodeTextId(id);
+      var nodeTextPosition = createNodeTextPosition(dx, dy);
+      d3.select("text#" + textId)
+        .attr('x', nodeTextPosition.x)
+        .attr('y', nodeTextPosition.y);
+      cLog("text position",  d3.select("text#" + textId));
+      
+      for (var source in pairs) {
+        for (var target in pairs[source]) {
+
+          // new position
+          var p1 = getPosition(source);
+          var p2 = getPosition(target);
+          if (this.id == source){
+            p1.x = dx;
+            p1.y = dy;
+          } else if (this.id == target){
+            p2.x = dx;
+            p2.y = dy;
+          }
+
+          var r1 = nodes[source].r;
+          var r2 = nodes[target].r;
+          var lines = pairs[source][target];
+          for (var i=0;i<lines.length;i++) {
+
+            // polyline
+            var line = lines[i];
+            var lineId = line.lineId;
+
+            var lineNumber = i + 1;
+            var lineNumberMax = lines.length;
+
+            var pathData = createPathData(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
+            var points = createPoints(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
+            var polyline = d3.select("polyline#" + line["lineId"]);
+            polyline.attr("points", points);
+            cLog("# polyline #", polyline);
+
+            // path
+            var path = d3.select("path#" + line["pathId"]);
+            path.attr("d", pathData);
+            cLog("# path #", path );
+
+            // textpath
+
+            /*
+              d3.js could not get "textPath" element. 
+              So this setting uses jQuery. (2013/04/28)
+              var textpath = d3.select("textPath#" + line["textPathId"]);
+            */
+
+            var textpath = $("textPath#" + line["textPathId"]);
+            textpath
+              .attr("startOffset", "50%")
+              .attr("text-anchor", "middle");
+            cLog("# textpath #", textpath );
+
+            // line text
+            var lineText = d3.select("text#" + line["lineTextId"]);
+            lineText
+              .attr("x", "")// for Safari 5.1.7
+              .attr("y", "")// for Safari 5.1.7
+              .attr("startOffset", "50%") // for Safari 5.1.7
+              .attr("text-anchor", "middle"); // for Safari 5.1.7
+            cLog("# linetext #", lineText);
+          }
+       }
+     }
+  });
+
+
 }
 
-function parseConfig(){
-  var update = updateTime;
-  var colors = lineColorItem;
-  var size = viewSize;
-  var nodeConfig = nodeItem;
-  var lineConfig = lineItem;
+function drawItem(svg) {
 
-  addViewSize(size);
-  addUpdate(update);
-  addColorChart(colors);
+  // fetch new config
+  var configJson = getJson(linkdraw.configPath);
 
-  if (nodeConfig) {
-    for (i=0; i<nodeConfig.length; i++) {
-      var nName   = nodeConfig[i][0];
-      var nWidth  = nodeConfig[i][1];
-      var nHeight = nodeConfig[i][2];
-      var nColor  = nodeConfig[i][3];
-      var nLink   = nodeConfig[i][4];
-      addNode(nName, nWidth, nHeight, nColor, nLink);
-    }
-  }
+  // keep old config and get new config
+  var _config = linkdraw.config;
+  linkdraw.config = initConfigData(configJson);
+  var config = linkdraw.config;
 
-  if (lineConfig) {
-    for (i=0; i<lineConfig.length; i++) {
-      var nNameA   = lineConfig[i][0];
-      var nNameB   = lineConfig[i][1];
-      var lColor   = lineConfig[i][2];
-      var lWidth   = lineConfig[i][3];
-      var lDescr   = lineConfig[i][4];
-      var lLink    = lineConfig[i][5];
-      var color = getColor(colors, lColor);
-      addLine(nNameA, nNameB, color, lWidth, lDescr, lLink);
-    }
-  }
+  // keep old config and get new config
+  var _nodes = linkdraw.nodes;
+  linkdraw.nodes = parseNodeConfig(config.nodes);
+  var nodes = linkdraw.nodes;
+
+  // keep old config and get new config
+  var _lines = linkdraw.lines;
+  linkdraw.lines = config.lines;
+  var lines = linkdraw.lines;
+
+  // for color chart
+  var lineColorConf = config.lineColors;
+  var lineColors = makeLineColors(lineColorConf);
+
+  // update time
+  updateTime(svg, config.time);
+
+  // update descr
+  updateDescr(svg, config.descr);
+
+  // color chart
+  updateLineColorChart(svg, lineColorConf, lineColors);
+
+  // keep old pairs and make new pairs
+  var _pairs = linkdraw.pairs;
+  linkdraw.pairs = makePairs(lines, lineColors);
+  var pairs = linkdraw.pairs;
+
+  // init node
+  nodes = initNodeConfig(nodes, pairs);
+
+  // add position to each lines
+  appendPosition();
+
+  // check node config diff
+  var nodeItems = getNodeConfigDiff(_nodes, nodes);
+  cLog("node config diff", nodeItems);
+
+  // check line config diff
+  var lineItems = getLineConfigDiff(lines, _lines, pairs, _pairs);
+  cLog("line config diff", lineItems);
+
+  // drag event
+  var drag = dragEvent();
+
+  // write node 
+  updateNode(svg, nodeItems, drag);
+
+  // write line
+  updateLine(svg, lineItems);
+
+  // change zoom value
+  transformView();
 
 }
 
-function svgmap(positionData){
+(function($) {
+  $.fn.linkDraw = function(sys) {
 
-  // linkdraw div is root
-  root = document.getElementById('linkdraw');
+    // debug
+    linkdraw.debug = true;
+    linkdraw.debug = false;
 
-  // make svg
-  svg = document.createElementNS(SVG,'svg');
+    //system settings
+    linkdraw.configPath   = sys.config;
+    linkdraw.positionPath = sys.position;
+    linkdraw.positionSave = sys.positionSave;
+    linkdraw.width        = sys.width;
+    linkdraw.height       = sys.height;
+    linkdraw.interval     = sys.interval;
 
-  // read node position data
-  positions = positionData['position'];
+    // svg settings
+    linkdraw.fontSize = "12px";
+    linkdraw.fontFamily = 'Arial, "sans-serif", "Lucida Grande", "MS P Gothic"';
+    linkdraw.fontWeight = "normal";
+    linkdraw.fontColor = "#333";
+    linkdraw.lineColor = "#666";
+    linkdraw.nodeColor = "#666";
+    linkdraw.nodeR = 4;
+    linkdraw.config = {};
+    linkdraw.nodes = {};
+    linkdraw.lines = {};
+    linkdraw.pairs = {};
 
-  // node and line configuration
-  configData();
-  parseConfig();
+    // get json data
+    var configJson   = getJson(linkdraw.configPath);
+    var positionJson = getJson(linkdraw.positionPath);
 
-  // create element 
-  createLines();
-  createNodes();
+    // init position data
+    linkdraw.position  = initPositionData(positionJson);
+    linkdraw.scale     = initScaleData(positionJson);
+    linkdraw.translate = initTranslateData(positionJson);
 
-  // for debug
-  if (DEBUG) {
-    for (var i in nodes)  { console.log(nodes[i]['id']); }
-    for (var i in lines)  { console.log(lines[i]['id']); }
-    for (var i in pairs)  { console.log(pairs[i].length); }
-    for (var i in shapes) { 
-      for (var n in shapes[i]) { 
-        console.log(shapes[i][n]['id']); 
-      }
+    // create svg
+    var svg = createSVG(this.selector);
+
+    // position save button
+    if (linkdraw.positionSave == false) {
+      // defult enable
+    } else {
+      createSaveButton(svg, linkdraw.positionPath);
+    }
+
+    // zoom
+    zoomEvent(svg);
+
+    // draw
+    drawItem(svg);
+    if (linkdraw.interval > 0) {
+      setInterval(function() {
+        drawItem(svg);
+      }, 1000 * linkdraw.interval);
     }
   }
-  root.appendChild(svg);
-}
+
+})(jQuery);
