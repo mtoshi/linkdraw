@@ -1,7 +1,7 @@
 {
     "time": "2013-05-23 15:45:45",
 
-    "descr": "START DEMO",
+    "descr": "This is linkdraw sample",
 
     "lineColors": [
         { "id": "LV5", "descr": "100-80%", "color": "#A52A2A" },
