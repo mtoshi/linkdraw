@@ -1,6 +1,6 @@
 {
     "lines": [
-        { "source": "A", "target": "B","color": "blue", "width": "1", "descr": "blue line", "link": "" }
+        { "source": "A", "target": "B","color": "", "width": "1", "descr": "", "link": "" }
     ]
 }
 	
