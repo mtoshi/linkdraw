@@ -342,20 +342,31 @@ function zoomRate() {
 function makeLineColors(colors) {
   obj = {};
   for (var i in colors) {
-    id    = colors[i].id;
-    color = colors[i].color;
+    var id    = colors[i].id;
+    var color = colors[i].color;
     obj[id] = color;
   }
   return obj;
 }
 function lineColorSelect(color, lineColors) {
 
+  var _color = lineColors[color];
+
+  // use "#123456"
   if (color.match(/#/)) {
     return color;
-  } else if (lineColors[color]) {
-    return lineColors[color];
-  } else {
+
+  // use default color
+  } else if (color == "") {
     return linkdraw.lineColor;
+
+  // use color name (ex: blue, red, green, etc.)
+  } else if (typeof _color === "undefined") {
+    return color;
+
+  // use defined color name of line color chart config.
+  } else {
+    return _color;
   }
 }
 
@@ -406,9 +417,11 @@ function initConfigData(obj) {
 
 function parseNodeConfig(nodes) {
   var x = {};
-  for (var i=0; i<nodes.length; i++) {
-    var node = nodes[i];
-    x[node.name] = node;
+  if (nodes) {
+    for (var i=0; i<nodes.length; i++) {
+      var node = nodes[i];
+      x[node.name] = node;
+    }
   }
   return x;
 }
