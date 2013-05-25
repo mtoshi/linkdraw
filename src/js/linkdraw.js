@@ -78,7 +78,7 @@ function positionUpload(filename) {
       type: 'POST',
       dataType:'text',
       contentType: "application/json; charset=utf-8",
-      url: 'write.cgi',
+      url: linkdraw.positionWriter,
       async: true,
       cache : false,
       data: str,
@@ -1268,6 +1268,7 @@ function drawItem(svg) {
     linkdraw.configPath   = sys.config;
     linkdraw.positionPath = sys.position;
     linkdraw.positionSave = sys.positionSave;
+    linkdraw.positionWriter = sys.positionWriter;
     linkdraw.width        = sys.width;
     linkdraw.height       = sys.height;
     linkdraw.interval     = sys.interval;
