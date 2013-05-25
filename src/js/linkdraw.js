@@ -917,7 +917,7 @@ function createLine(svg, lines) {
 
     lineGroup.append("polyline")
       .attr("id", lineId)
-      .style("stroke-linecap", "round")
+      .style("stroke-linecap", "butt")
       .style("stroke", lineColor)
       .style("opacity", 1.0)
       .style("stroke-width", lineWidth)
