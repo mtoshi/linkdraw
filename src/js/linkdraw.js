@@ -36,7 +36,10 @@ var linkdraw = {};
 */
 
 function cLog(x) {
-  if (linkdraw.debug) console.log(x);
+  // debug
+  var debug = false;
+  var debug = true;
+  if (debug) console.log(x);
 }
 
 function randNum(n){
@@ -72,7 +75,8 @@ function positionUpload(filename) {
 
     var json = createPositionData(filename);
     var str = JSON.stringify(json);
-    cLog("# position save data #", JSON.parse(str));
+    cLog("# position save data #");
+    cLog(JSON.parse(str));
 
     $.ajax({
       type: 'POST',
@@ -110,7 +114,8 @@ function getJson(filename) {
     success: function(data) {
       var json = JSON.stringify(data);
       config = JSON.parse(json)
-      cLog("ajax config load", config);
+      cLog("ajax config load");
+      cLog(config);
     },
     error: function () {
       cLog("ajax config load error");
@@ -678,9 +683,14 @@ function getNodeConfigDiff(nodeOld, nodeNew) {
     }
   }
 
-  cLog("### node config diff add ###", addItem);
-  cLog("### node config diff del ###", delItem);
-  cLog("### node config diff mod ###", modItem);
+  cLog("### node config diff add ###");
+  cLog(addItem);
+
+  cLog("### node config diff del ###");
+  cLog(delItem);
+
+  cLog("### node config diff mod ###");
+  cLog(modItem);
 
   return { "add":addItem, "del":delItem, "mod":modItem };
 }
@@ -862,7 +872,8 @@ function updateLineColorChart(svg, colors, lineColors) {
         .style("fill", "#FFF")
         .text(colors[i].descr);
     }
-    cLog("# color check", colors);
+    cLog("# color check");
+    cLog(colors);
   }
 }
 
@@ -1016,7 +1027,8 @@ function makePairs(lines, lineColors) {
     addPair(pairs, source, target, line);
 
   }
-  cLog("# config lines #", lines);
+  cLog("# config lines #");
+  cLog(lines);
 
   return pairs;
 }
@@ -1069,12 +1081,6 @@ function appendPosition() {
         var pathData = createPathData(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
         var points = createPoints(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
 
-        cLog("# ----------------- #", "");
-        cLog("# lineNumber #", lineNumber);
-        cLog("# lineNumberMax #", lineNumberMax);
-        cLog("# path data #", pathData);
-        cLog("# point data #", points);
-
         // store 
         line["pathData"] = pathData;
         line["points"]   = points;
@@ -1115,14 +1121,15 @@ function dragEvent() {
       d3.select(this)
         .attr('cx', dx)
         .attr('cy', dy);
-      cLog("node position",  id);
+      cLog("node position" + id);
 
       var textId = createNodeTextId(id);
       var nodeTextPosition = createNodeTextPosition(dx, dy);
       d3.select("text#" + textId)
         .attr('x', nodeTextPosition.x)
         .attr('y', nodeTextPosition.y);
-      cLog("text position",  d3.select("text#" + textId));
+      cLog("text position");
+      cLog(d3.select("text#" + textId));
       
       for (var source in pairs) {
         for (var target in pairs[source]) {
@@ -1154,12 +1161,14 @@ function dragEvent() {
             var points = createPoints(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
             var polyline = d3.select("polyline#" + line["lineId"]);
             polyline.attr("points", points);
-            cLog("# polyline #", polyline);
+            cLog("# polyline #");
+            cLog(polyline);
 
             // path
             var path = d3.select("path#" + line["pathId"]);
             path.attr("d", pathData);
-            cLog("# path #", path );
+            cLog("# path #");
+            cLog(path);
 
             // textpath
 
@@ -1173,7 +1182,8 @@ function dragEvent() {
             textpath
               .attr("startOffset", "50%")
               .attr("text-anchor", "middle");
-            cLog("# textpath #", textpath );
+            cLog("# textpath #");
+            cLog(textpath);
 
             // line text
             var lineText = d3.select("text#" + line["lineTextId"]);
@@ -1182,7 +1192,8 @@ function dragEvent() {
               .attr("y", "")// for Safari 5.1.7
               .attr("startOffset", "50%") // for Safari 5.1.7
               .attr("text-anchor", "middle"); // for Safari 5.1.7
-            cLog("# linetext #", lineText);
+            cLog("# linetext #");
+            cLog(lineText);
           }
        }
      }
@@ -1237,11 +1248,13 @@ function drawItem(svg) {
 
   // check node config diff
   var nodeItems = getNodeConfigDiff(_nodes, nodes);
-  cLog("node config diff", nodeItems);
+  cLog("node config diff");
+  cLog(nodeItems);
 
   // check line config diff
   var lineItems = getLineConfigDiff(lines, _lines, pairs, _pairs);
-  cLog("line config diff", lineItems);
+  cLog("line config diff");
+  cLog(lineItems);
 
   // drag event
   var drag = dragEvent();
@@ -1259,10 +1272,6 @@ function drawItem(svg) {
 
 (function($) {
   $.fn.linkDraw = function(sys) {
-
-    // debug
-    linkdraw.debug = true;
-    linkdraw.debug = false;
 
     //system settings
     linkdraw.configPath   = sys.config;
