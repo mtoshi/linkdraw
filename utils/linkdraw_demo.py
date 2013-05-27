@@ -58,7 +58,7 @@ def line(source, target, color, width, descr, link):
             '"color": "%s", "width": "%s", "descr": "%s", "link": "%s" }') % (
             indent, source, target, color, width, descr, link)
 
-def colors():
+def sample_colors():
     return [
 
         color("LV5", "100-80%", "#A52A2A"),
@@ -71,7 +71,7 @@ def colors():
     ]
 
 
-def nodes():
+def sample_nodes():
     return [
 
         node("TRANSIT-A", "6", "#CD5C5C", ""),
@@ -109,7 +109,7 @@ def nodes():
 
     ]
 
-def lines():
+def sample_lines():
     return [
 
         line("TRANSIT-A", "RouterA", "LV1", "1", "10G", ""),
@@ -170,6 +170,18 @@ def change_line(lines, regex, val, new_val):
             _lines.append(line)
     return _lines 
 
+def del_line(lines, regex):
+    _lines = []
+    for line in lines:
+        if not re.search(regex, line):
+            _lines.append(line)
+    return _lines 
+
+def add_line(lines, source, target, color, width, descr, link):
+    _line = line(source, target, color, width, descr, link)
+    lines.append(_line)
+    return lines
+
 def update(path, config, t):
     write_file(path, config)
     sleep(n)
@@ -182,11 +194,12 @@ if __name__ == "__main__":
     n = 10 # iterate 
     t = 12 # interval
 
-    lines  = lines()
-    nodes  = nodes()
-    colors = colors()
-
     for i in range(n):
+
+        # init
+        lines  = sample_lines()
+        nodes  = sample_nodes()
+        colors = sample_colors()
 
         # start
         descr = "START DEMO"
@@ -249,6 +262,18 @@ if __name__ == "__main__":
         config = template(time(), descr, colors,  nodes, lines)
         update(path, config, t)
 
+        # delete line
+        descr = "Delete line."
+        lines = del_line(lines, "Down")
+        config = template(time(), descr, colors,  nodes, lines)
+        update(path, config, t)
+
+        # add line
+        descr = "Add line."
+        lines = add_line(lines, "RouterY", "RouterC", "LV1", "1.0", "2G(NEW)", "")
+        config = template(time(), descr, colors,  nodes, lines)
+        update(path, config, t)
+
         # end
         descr = "END"
         lines = change_line(lines, "LV.*", "LV5", "LV1")
@@ -259,4 +284,5 @@ if __name__ == "__main__":
         lines = change_line(lines, "Down.*", "Down", "2G")
         config = template(time(), descr, colors,  nodes, lines)
         update(path, config, t)
+
 
