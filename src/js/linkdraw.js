@@ -853,14 +853,14 @@ function createText(svg, id, update, x, y) {
   }
 }
 
-function updateLineColorChart(svg, colors, lineColors) {
+function updateLineColorChart(svg, sysId, colors, lineColors) {
 
   // padding
   var padding_left = 10;
 
   // html class for remove and create 
-  var class_rect = "color_chart_rect";
-  var class_text = "color_chart_text";
+  var class_rect = "color_chart_rect" + sysId;
+  var class_text = "color_chart_text" + sysId;
 
   // color box height and width
   var color_chart_box_height = 20;
@@ -1264,7 +1264,7 @@ function drawItem(svg, sysId) {
   updateDescr(svg, linkdraw[sysId].config.descr);
 
   // color chart
-  updateLineColorChart(svg, lineColorConf, lineColors);
+  updateLineColorChart(svg, sysId, lineColorConf, lineColors);
 
   // keep old pairs and make new pairs
   var _pairs = linkdraw[sysId].pairs;
