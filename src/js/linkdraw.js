@@ -988,8 +988,12 @@ function createNode(svg, sysId, nodes, drag) {
       .attr("id", nodeId)
       .attr("cx", p.x)
       .attr("cy", p.y)
-      .attr("r", r)
-      .call(drag);
+      .attr("r", r);
+
+    // drag event
+    if (drag) {
+      d3.select("circle#" + nodeId).call(drag);
+    }
 
     nodeGroup.append("a")
       .attr("xlink:href", node.link)
@@ -1279,8 +1283,14 @@ function drawItem(svg, sysId) {
   cLog("line config diff");
   cLog(lineItems);
 
-  // drag event
-  var drag = dragEvent(sysId);
+  // drag
+  if (linkdraw[sysId].drag == false) {
+    // disable
+    var drag = false;
+  } else {
+    // enable(default)
+    var drag = dragEvent(sysId);
+  }
 
   // write node 
   updateNode(svg, sysId, nodeItems, drag);
@@ -1334,13 +1344,19 @@ function drawItem(svg, sysId) {
 
     // position save button
     if (sys.positionSave == false) {
-      // defult enable
+      // disable
     } else {
+      // enable(default)
       createSaveButton(svg, sysId);
     }
 
     // zoom
-    zoomEvent(svg, sysId);
+    if (sys.zoom == false) {
+      // disable
+    } else {
+      // enable(default)
+      zoomEvent(svg, sysId);
+    }
 
     // draw
     drawItem(svg, sysId);
