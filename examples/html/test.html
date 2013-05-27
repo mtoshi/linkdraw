@@ -5,19 +5,37 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="js/linkdraw.js"></script>
+
 <script type="text/javascript">
   $(function(){
-     $("#linkdraw").linkDraw({
-       "configPath": "configs/sample_config.json", 
-       "positionPath": "positions/sample_position.json", 
+     $("#sample1").linkDraw({
+       "configPath": "configs/sample1_config.json", 
+       "positionPath": "positions/sample1_position.json", 
        "positionWriter": "write.cgi",
-       //"positionSave": false,
-       "width": 1200,
-       "height": 600,
-       "interval": 300
+       "positionSave": false,
+       "width": 200,
+       "height": 200,
+       "interval":10 
      });
   });
 </script>
+
+<script type="text/javascript">
+  $(function(){
+     $("#sample2").linkDraw({
+       "configPath": "configs/sample2_config.json", 
+       "positionPath": "positions/sample2_position.json", 
+       "positionWriter": "write.cgi",
+       //"positionSave": false,
+       "width": 200,
+       "height": 200,
+       "interval": 10
+     });
+  });
+</script>
+
+
+
 <title>Linkdraw</title>
 </head>
 <body>
@@ -27,7 +45,8 @@
   </div>
   
   <div id="container">
-    <div id="linkdraw"></div>
+    <div id="sample1"></div>
+    <div id="sample2"></div>
   </div>
   
   <div id="footer">

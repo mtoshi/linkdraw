@@ -37,8 +37,8 @@ var linkdraw = {};
 
 function cLog(x) {
   // debug
-  var debug = true;
   var debug = false;
+  var debug = true;
   if (debug) console.log(x);
 }
 
@@ -125,17 +125,6 @@ function getJson(filename) {
   });
 
   return config;
-}
-
-function getConfigData(filename) {
-
-  // first time
-  getJson(filename);
-
-  // after second
-  setInterval(function() {
-    getJson(filename);
-  }, 1000 * 10);
 }
 
 function lineIdFormat(str, sysId, source, target, n){
@@ -417,7 +406,7 @@ function initConfigData(obj) {
   }
 }
 
-function margeNodeConfig(sysId, nodes, lineNodes) {
+function mergeNodeConfig(sysId, nodes, lineNodes) {
   var x = {};
   for (var name in lineNodes) {
     var node = nodes[name];
@@ -744,15 +733,12 @@ function delNode(svg, sysId, nodes) {
     var node = node[id];
 
     // del group
-    //var groupId = createNodeGroupId(sysId, id);
     d3.select("g#" + node.groupId).remove();
 
     // del circle
-    //var nodeId = createNodeId(sysId, id);
     d3.select("circle#" + node.id).remove();
 
     // del text 
-    //var textId = createNodeTextId(sysId, id);
     d3.select("text#" + node.textId).remove();
 
   }
@@ -769,14 +755,12 @@ function modNode(svg, sysId, nodes) {
 
     // mod circle
     var node = nodes[id];
-    //var nodeId = createNodeId(sysId, id);
     d3.select("circle#" + node.id)
       .style("stroke", node.color)
       .style("fill", node.color)
       .attr("r", node.r);
 
     // mod text 
-    //var textId = createNodeTextId(sysId, id);
     d3.select("text#" + node.textId)
       .attr("xlink:href", node.link)
       .style("color", linkdraw.fontColor)
@@ -1149,7 +1133,6 @@ function dragEvent(sysId) {
     .on("drag", function() {
 
       var pairs = linkdraw[sysId].pairs;
-console.log(linkdraw[sysId].pairs);
       var nodes = linkdraw[sysId].nodes;
       var dx, dy; 
       var id = this.id;
@@ -1243,15 +1226,12 @@ console.log(linkdraw[sysId].pairs);
      }
   });
 
-
 }
 
-function drawItem(svg, sys) {
-
-  var sysId = sys.id;
+function drawItem(svg, sysId) {
 
   // fetch new config
-  var configJson = getJson(sys.config);
+  var configJson = getJson(linkdraw[sysId].configPath);
 
   // keep old config and get new config
   var _config = linkdraw[sysId].config;
@@ -1267,7 +1247,7 @@ function drawItem(svg, sys) {
 
   // merge node config(line node name + node config)
   var lineNodes = extractLineNode(linkdraw[sysId].lines);
-  linkdraw[sysId].nodes = margeNodeConfig(sysId, linkdraw[sysId].nodes, lineNodes);
+  linkdraw[sysId].nodes = mergeNodeConfig(sysId, linkdraw[sysId].nodes, lineNodes);
 
   // for color chart
   var lineColorConf = linkdraw[sysId].config.lineColors;
@@ -1325,14 +1305,8 @@ function drawItem(svg, sys) {
     sys.id = linkdraw.count;
     var sysId = sys.id;
 
-    // make system space
-    linkdraw[sysId] = {};
-
     // keep system settings
-    linkdraw[sysId].positionPath   = sys.position;
-    linkdraw[sysId].positionWriter = sys.positionWriter;
-    linkdraw[sysId].width          = sys.width;
-    linkdraw[sysId].height         = sys.height;
+    linkdraw[sysId] = sys;
 
     // keep system config values
     linkdraw[sysId].config = {};
@@ -1349,11 +1323,8 @@ function drawItem(svg, sys) {
     linkdraw.nodeColor = "#666";
     linkdraw.nodeR = 4;
 
-    // get json data
-    var configJson   = getJson(sys.config);
-    var positionJson = getJson(sys.position);
-
     // init position data
+    var positionJson = getJson(linkdraw[sysId].positionPath);
     linkdraw[sysId].position  = initPositionData(positionJson);
     linkdraw[sysId].scale     = initScaleData(positionJson);
     linkdraw[sysId].translate = initTranslateData(positionJson);
@@ -1372,10 +1343,10 @@ function drawItem(svg, sys) {
     zoomEvent(svg, sysId);
 
     // draw
-    drawItem(svg, sys);
+    drawItem(svg, sysId);
     if (sys.interval > 0) {
       setInterval(function() {
-        drawItem(svg, sys);
+        drawItem(svg, sysId);
       }, 1000 * sys.interval);
     }
   }
