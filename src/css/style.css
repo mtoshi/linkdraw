@@ -3,12 +3,18 @@ body {
   padding: 0;
   margin: 0; 
   font-size: 12px;
-  font-family: '"Hiragino Kaku Gothic Pro", "Meiryo", "Lucida Grande","Arial", "MS P Gothic", sans-serif';
+  font-family: Arial;
 }
 h1 {
-  font-size: 32px;
   padding: 4px 4px 4px 8px;
   margin: 0px; 
+  font-size: 32px;
+}
+h2 {
+  color: #FFF;
+  text-align: center;
+  font-weight: normal;
+  font-size: 24px;
 }
 #header{
   width: 100%; 
@@ -31,7 +37,11 @@ h1 {
   margin-bottom: 4px;
 }
 #container p{
+  font-size: 15px;
   color: #FFF;
+  font-style: italic;
+  padding: 0px;
+  margin: 4px 0px 0px 0px; 
 }
 #container a{
   color: #FFF;
