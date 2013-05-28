@@ -37,8 +37,8 @@ var linkdraw = {};
 
 function cLog(x) {
   // debug
-  var debug = false;
   var debug = true;
+  var debug = false;
   if (debug) console.log(x);
 }
 
@@ -407,19 +407,29 @@ function initConfigData(obj) {
 }
 
 function mergeNodeConfig(sysId, nodes, lineNodes) {
+
   var x = {};
+
+  // merge line node and node config
   for (var name in lineNodes) {
     var node = nodes[name];
     if (node) {
     } else {
       node = defaultNodeConfig(name);
+      nodes[name] = node;
     }
+  }
+
+  for (var name in nodes) {
 
     // id
     var nodeId     = createNodeId(sysId, name);
     var textId     = createNodeTextId(sysId, name);
     var groupId    = createNodeGroupId(sysId, name);
     var sysGroupId = createSysGroupId(sysId);
+
+    // add id
+    var node = nodes[name];
     node.id         = nodeId;
     node.textId     = textId;
     node.groupId    = groupId;
