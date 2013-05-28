@@ -13,6 +13,9 @@
     ],
 
     "nodes": [
+        { "name": "A", "r": "6", "color": "red", "link": "" },
+        { "name": "B", "r": "6", "color": "red", "link": "" },
+        { "name": "C", "r": "6", "color": "red", "link": "" },
         { "name": "TRANSIT-A", "r": "6", "color": "#CD5C5C", "link": "" },
         { "name": "TRANSIT-B", "r": "6", "color": "#CD5C5C", "link": "" },
         { "name": "TRANSIT-C", "r": "6", "color": "#CD5C5C", "link": "" },

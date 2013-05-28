@@ -1,6 +1,4 @@
 {
-    "descr": "sample5",
-
     "lines": [
         { "source": "A", "target": "B","color": "#6495ED", "width": "1", "descr": "1", "link": "" },
         { "source": "B", "target": "C","color": "#B22222", "width": "1", "descr": "2", "link": "" },

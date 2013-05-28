@@ -3,7 +3,9 @@
         { "name": "A", "r": "4", "color": "#CD5C5C", "link": "" },
         { "name": "B", "r": "4", "color": "#CD5C5C", "link": "" },
         { "name": "C", "r": "4", "color": "#CD5C5C", "link": "" },
-        { "name": "D", "r": "4", "color": "#CD5C5C", "link": "" }
+        { "name": "D", "r": "4", "color": "#CD5C5C", "link": "" },
+        { "name": "E", "r": "4", "color": "#4682B4", "link": "" },
+        { "name": "F", "r": "4", "color": "#4682B4", "link": "" }
     ],
 
     "lines": [

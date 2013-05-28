@@ -30,6 +30,12 @@ h1 {
   margin-right: auto;
   margin-bottom: 4px;
 }
+#container p{
+  color: #FFF;
+}
+#container a{
+  color: #FFF;
+}
 #footer{
   width: 100%; 
   color: #FFF;
