@@ -43,9 +43,13 @@
 
         { "source": "A1",   "target": "A1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
         { "source": "A1",   "target": "A1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "A1",   "target": "A1-3","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "A1",   "target": "A1-4","color": "LV1", "width": "1", "descr": "10G", "link": "" },
 
         { "source": "A2",   "target": "A1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
         { "source": "A2",   "target": "A1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "A2",   "target": "A1-3","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "A2",   "target": "A1-4","color": "LV1", "width": "1", "descr": "10G", "link": "" },
 
         { "source": "A1-1", "target": "A1-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "A1-1", "target": "A1-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
@@ -57,13 +61,26 @@
         { "source": "A1-2", "target": "A2-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "A1-2", "target": "A2-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
 
+        { "source": "A1-3", "target": "A3-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-3", "target": "A3-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-3", "target": "A3-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-3", "target": "A3-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+
+        { "source": "A1-4", "target": "A4-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-4", "target": "A4-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-4", "target": "A4-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-4", "target": "A4-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
 
 
         { "source": "B1",   "target": "B1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
         { "source": "B1",   "target": "B1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "B1",   "target": "B1-3","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "B1",   "target": "B1-4","color": "LV1", "width": "1", "descr": "10G", "link": "" },
 
         { "source": "B2",   "target": "B1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
         { "source": "B2",   "target": "B1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "B2",   "target": "B1-3","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "B2",   "target": "B1-4","color": "LV1", "width": "1", "descr": "10G", "link": "" },
 
         { "source": "B1-1", "target": "B1-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "B1-1", "target": "B1-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
