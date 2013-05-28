@@ -36,7 +36,10 @@ var linkdraw = {};
 */
 
 function cLog(x) {
-  if (linkdraw.debug) console.log(x);
+  // debug
+  var debug = true;
+  var debug = false;
+  if (debug) console.log(x);
 }
 
 function randNum(n){
@@ -49,36 +52,38 @@ function randNum(n){
   }
 }
 
-function createPositionData(filename){
+function createPositionData(sysId){
   var position = {};
-  var nodes = $("circle");
+  var nodes = linkdraw[sysId].nodes;
   for (var i in nodes) {
     var node = nodes[i];
-    var id = node.id;
-    if (id) {
-      var x = node.getAttribute("cx");
-      var y = node.getAttribute("cy");
-      position[id] = { "x": parseInt(x), "y": parseInt(y) };
-    }
+    var id   = node.id;
+    var name = node.name;
+    $("circle#" + id).each(function() {
+      var x = this.getAttribute("cx");
+      var y = this.getAttribute("cy");
+      position[name] = { "x": parseInt(x), "y": parseInt(y) };
+    });
   }
-  return { "file": filename , "data": { "position": position, "scale": linkdraw.scale, "translate": linkdraw.translate } }
+  return { "file": linkdraw[sysId].positionPath, "data": { "position": position, "scale": linkdraw[sysId].scale, "translate": linkdraw[sysId].translate } }
 }
 
-function positionUpload(filename) {
+function positionUpload(sysId) {
 
-  var id = createSaveButtonId();
+  var id = createSaveButtonId(sysId);
 
   $("." + id).click(function(){
 
-    var json = createPositionData(filename);
+    var json = createPositionData(sysId);
     var str = JSON.stringify(json);
-    cLog("# position save data #", JSON.parse(str));
+    cLog("# position save data #");
+    cLog(JSON.parse(str));
 
     $.ajax({
       type: 'POST',
       dataType:'text',
       contentType: "application/json; charset=utf-8",
-      url: 'write.cgi',
+      url: linkdraw[sysId].positionWriter,
       async: true,
       cache : false,
       data: str,
@@ -110,7 +115,8 @@ function getJson(filename) {
     success: function(data) {
       var json = JSON.stringify(data);
       config = JSON.parse(json)
-      cLog("ajax config load", config);
+      cLog("ajax config load");
+      cLog(config);
     },
     error: function () {
       cLog("ajax config load error");
@@ -121,76 +127,62 @@ function getJson(filename) {
   return config;
 }
 
-function getConfigData(filename) {
-
-  // first time
-  getJson(filename);
-
-  // after second
-  setInterval(function() {
-    getJson(filename);
-  }, 1000 * 10);
+function lineIdFormat(str, sysId, source, target, n){
+  return str + "_" + sysId + "_" + source + "_" + target + "_" + n;
+}
+function createLineId(sysId, source, target, n){
+  return lineIdFormat("line", sysId, source, target, n);
+}
+function createLineTextId(sysId, source, target, n){
+  return lineIdFormat("linetext", sysId, source, target, n);
+}
+function createLineTextPathId(sysId, source, target, n){
+  return lineIdFormat("textpath", sysId, source, target, n);
+}
+function createLinePathId(sysId, source, target, n){
+  return lineIdFormat("path", sysId, source, target, n);
 }
 
-function lineIdFormat(str, source, target, n){
-  return str + "_" + source + "_" + target + "_" + n;
+function createSysGroupId(sysId){
+  return "group_" + sysId;
 }
-function createLineId(source, target, n){
-  return lineIdFormat("line", source, target, n);
+function createNodeGroupId(sysId, nodeName){
+  return "node_group_" + sysId + "_" + nodeName;
 }
-function createLineTextId(source, target, n){
-  return lineIdFormat("linetext", source, target, n);
+function createNodeId(sysId, nodeName){
+  return "node_" + sysId + "_" + nodeName;
 }
-function createLineTextPathId(source, target, n){
-  return lineIdFormat("textpath", source, target, n);
+function createLineGroupId(sysId, lineId){
+  return "line_group_" + sysId + "_" + lineId;
 }
-function createLinePathId(source, target, n){
-  return lineIdFormat("path", source, target, n);
-}
-
-function createNodeGroupId(nodeName){
-  return "node_group_" + nodeName;
-}
-function createLineGroupId(lineId){
-  return "line_group_" + lineId;
-}
-function createNodeTextId(nodeName){
-  return "text_" + nodeName;
+function createNodeTextId(sysId, nodeName){
+  return "text_" + sysId + "_" + nodeName;
 }
 
-function createSaveButtonId(){
-  return "positionSave";
+function createSaveButtonId(sysId){
+  return "positionSave_" + sysId;
 }
 
 function createNodeTextPosition(x, y){
   return { "x": x + 10, "y": y - 10 };
 }
 
-function defaultNodeConfig(){
-  return { "r":linkdraw.nodeR, "color":linkdraw.nodeColor, "link": "" };
+function defaultNodeConfig(name){
+  return { "name": name, "r":linkdraw.nodeR, "color":linkdraw.nodeColor, "link": "" };
 }
 
-function checkNode(id, nodes){
-  var n = nodes[id];
-  if (n){
-    return n;
-  } else {
-    return defaultNodeConfig();
-  }
-}
-
-function getPosition(id){
-  var position = linkdraw.position;
-  var width  = linkdraw.width;
-  var height = linkdraw.height;
-  var p = position[id];
+function getPosition(name, sysId){
+  var position = linkdraw[sysId].position;
+  var width  = linkdraw[sysId].width;
+  var height = linkdraw[sysId].height;
+  var p = position[name];
   if (p){
     return p;
   } else {
     var x = randNum(width);
     var y = randNum(height);
-    position[id] = { "x": x, "y": y };
-    return position[id];
+    position[name] = { "x": x, "y": y };
+    return position[name];
   }
 }
 
@@ -324,18 +316,17 @@ function addNodeLineBind(obj, nodeName, line) {
   }
 }
 
-function transformView() {
-  d3.selectAll("g.nodeGroup")
-    .attr("transform", "translate(" + linkdraw.translate + ")" + " scale(" + linkdraw.scale + ")");
-  d3.selectAll("g.lineGroup")
-    .attr("transform", "translate(" + linkdraw.translate + ")" + " scale(" + linkdraw.scale + ")");
+function transformView(sysId) {
+  var sysGroupId = createSysGroupId(sysId);
+  d3.selectAll("." + sysGroupId)
+    .attr("transform", "translate(" + linkdraw[sysId].translate + ")" + " scale(" + linkdraw[sysId].scale + ")");
 }
 
-function zoomRate() {
-  if (linkdraw.scale >= 1){
+function zoomRate(sysId) {
+  if (linkdraw[sysId].scale >= 1){
     return 1;
   } else {
-    return 1 + 1 - linkdraw.scale;
+    return 1 + 1 - linkdraw[sysId].scale;
   }
 }
 
@@ -415,12 +406,61 @@ function initConfigData(obj) {
   }
 }
 
-function parseNodeConfig(nodes) {
+function mergeNodeConfig(sysId, nodes, lineNodes) {
+
+  var x = {};
+
+  // merge line node and node config
+  for (var name in lineNodes) {
+    var node = nodes[name];
+    if (node) {
+    } else {
+      node = defaultNodeConfig(name);
+      nodes[name] = node;
+    }
+  }
+
+  for (var name in nodes) {
+
+    // id
+    var nodeId     = createNodeId(sysId, name);
+    var textId     = createNodeTextId(sysId, name);
+    var groupId    = createNodeGroupId(sysId, name);
+    var sysGroupId = createSysGroupId(sysId);
+
+    // add id
+    var node = nodes[name];
+    node.id         = nodeId;
+    node.textId     = textId;
+    node.groupId    = groupId;
+    node.sysGroupId = sysGroupId;
+
+    // store
+    x[nodeId] = node;
+
+  }
+  return x; 
+}
+
+function extractLineNode(lines){
+  var nodes = {}; 
+  for (var i=0;i<lines.length;i++) {
+    var line = lines[i];
+    var source = line.source;
+    var target = line.target;
+    nodes[source] = line;
+    nodes[target] = line;
+  }
+  return nodes;
+}
+
+function parseNodeConfig(sysId, nodes) {
   var x = {};
   if (nodes) {
     for (var i=0; i<nodes.length; i++) {
       var node = nodes[i];
-      x[node.name] = node;
+      var nodeName = node.name;
+      x[nodeName] = node;
     }
   }
   return x;
@@ -455,7 +495,6 @@ function lineConfigVals(mod, add, del) {
 
 function getLineConfigDiff(linesNew, linesOld, pairsNew, pairsOld) {
 
-  //var item = {};
   var addItem = {};
   var modItem = {};
   var delItem = {};
@@ -508,9 +547,9 @@ function getLineConfigDiff(linesNew, linesOld, pairsNew, pairsOld) {
   
 }
 
-function updateTime(svg, time) {
+function updateTime(svg, sysId, time) {
 
-  var id = "time";
+  var id = "sys_time_" + sysId;
 
   // delete time
   d3.select("text#" + id).remove();
@@ -519,9 +558,9 @@ function updateTime(svg, time) {
   createText(svg, id, time, "10", "20");
 }
 
-function updateDescr(svg, descr) {
+function updateDescr(svg, sysId, descr) {
 
-  var id = "descr";
+  var id = "sys_descr_" + sysId;
 
   // delete descr
   d3.select("text#" + id).remove();
@@ -678,75 +717,80 @@ function getNodeConfigDiff(nodeOld, nodeNew) {
     }
   }
 
-  cLog("### node config diff add ###", addItem);
-  cLog("### node config diff del ###", delItem);
-  cLog("### node config diff mod ###", modItem);
+  cLog("### node config diff add ###");
+  cLog(addItem);
+
+  cLog("### node config diff del ###");
+  cLog(delItem);
+
+  cLog("### node config diff mod ###");
+  cLog(modItem);
 
   return { "add":addItem, "del":delItem, "mod":modItem };
 }
 
-function addNode(svg, nodes, drag) {
+function addNode(svg, sysId, nodes, drag) {
 
   // add new node
-  createNode(svg, nodes, drag);
+  createNode(svg, sysId, nodes, drag);
 
 }
 
-function delNode(svg, nodes) {
+function delNode(svg, sysId, nodes) {
 
   for (var id in nodes) {
 
+    var node = node[id];
+
     // del group
-    var groupId = createNodeGroupId(id);
-    d3.select("g#" + groupId).remove();
+    d3.select("g#" + node.groupId).remove();
 
     // del circle
-    d3.select("circle#" + id).remove();
+    d3.select("circle#" + node.id).remove();
 
     // del text 
-    var textId = createNodeTextId(id);
-    d3.select("text#" + textId).remove();
+    d3.select("text#" + node.textId).remove();
 
   }
 }
 
-function modNode(svg, nodes) {
+function modNode(svg, sysId, nodes) {
 
   for (var id in nodes) {
 
     var node = nodes[id];
-    var p = getPosition(id);
+    var nodeName = node.name;
+    var p = getPosition(nodeName, sysId);
     var r = node.r;
 
     // mod circle
     var node = nodes[id];
-    d3.select("circle#" + id)
+    d3.select("circle#" + node.id)
       .style("stroke", node.color)
       .style("fill", node.color)
       .attr("r", node.r);
 
     // mod text 
-    var textId = createNodeTextId(id);
-    d3.select("text#" + textId)
+    d3.select("text#" + node.textId)
       .attr("xlink:href", node.link)
       .style("color", linkdraw.fontColor)
       .style("font-size", linkdraw.fontSize)
       .style("font-weight", linkdraw.fontWeight)
       .style("font-family", linkdraw.fontFamily)
-      .text(id);
+      .text(nodeName);
   }
 }
 
-function updateNode(svg, item, drag) {
-  addNode(svg, item.add, drag);
-  delNode(svg, item.del);
-  modNode(svg, item.mod);
+function updateNode(svg, sysId, item, drag) {
+  addNode(svg, sysId, item.add, drag);
+  delNode(svg, sysId, item.del);
+  modNode(svg, sysId, item.mod);
 }
 
-function createSVG(id){
+function createSVG(id, sys){
 
-  var width  = linkdraw.width;
-  var height = linkdraw.height;
+  var width  = sys.width;
+  var height = sys.height;
 
   d3.select(id)
     .style("width", width + "px")
@@ -769,14 +813,14 @@ function createSVG(id){
   return svg
 }
 
-function createSaveButton(svg, positionPath) {
+function createSaveButton(svg, sysId) {
 
   var x = 10;
   var y = 60;
   var width = 100;
   var height = 20;
   var leftSpace = 10;
-  var id = createSaveButtonId();
+  var id = createSaveButtonId(sysId);
 
   svg.append("rect")
     .attr("class", id)
@@ -784,7 +828,7 @@ function createSaveButton(svg, positionPath) {
     .attr("height", height + "px")
     .attr("x", x + "px")
     .attr("y", y + "px")
-    .on("click", positionUpload(positionPath))
+    .on("click", positionUpload(sysId))
     .attr("rx", "4px")
     .attr("ry", "4px")
     .attr("stroke", "#004666")
@@ -800,7 +844,7 @@ function createSaveButton(svg, positionPath) {
     .style("font-size", linkdraw.fontSize)
     .style("font-weight", linkdraw.fontWeight)
     .style("font-family", linkdraw.fontFamily)
-    .on("click", positionUpload(positionPath))
+    .on("click", positionUpload(sysId))
     .text("Position Save");
 
 }
@@ -819,14 +863,14 @@ function createText(svg, id, update, x, y) {
   }
 }
 
-function updateLineColorChart(svg, colors, lineColors) {
+function updateLineColorChart(svg, sysId, colors, lineColors) {
 
   // padding
   var padding_left = 10;
 
   // html class for remove and create 
-  var class_rect = "color_chart_rect";
-  var class_text = "color_chart_text";
+  var class_rect = "color_chart_rect" + sysId;
+  var class_text = "color_chart_text" + sysId;
 
   // color box height and width
   var color_chart_box_height = 20;
@@ -862,7 +906,8 @@ function updateLineColorChart(svg, colors, lineColors) {
         .style("fill", "#FFF")
         .text(colors[i].descr);
     }
-    cLog("# color check", colors);
+    cLog("# color check");
+    cLog(colors);
   }
 }
 
@@ -879,6 +924,7 @@ function createLine(svg, lines) {
     var textPathId  = line.textPathId;
     var lineTextId  = line.lineTextId;
     var lineGroupId = line.lineGroupId;
+    var sysGroupId  = line.sysGroupId;
 
     // position
     var pathData = line.pathData;
@@ -890,9 +936,11 @@ function createLine(svg, lines) {
     // width
     var lineWidth = line.width;
 
+   
     var lineGroup = svg.append("g")
       .attr("id", lineGroupId)
-      .attr("class", "lineGroup")
+      //.attr("class", "lineGroup")
+      .attr("class", sysGroupId)
       .style("fill", "none");
 
     lineGroup.append("path")
@@ -917,7 +965,7 @@ function createLine(svg, lines) {
 
     lineGroup.append("polyline")
       .attr("id", lineId)
-      .style("stroke-linecap", "round")
+      .style("stroke-linecap", "butt")
       .style("stroke", lineColor)
       .style("opacity", 1.0)
       .style("stroke-width", lineWidth)
@@ -925,29 +973,37 @@ function createLine(svg, lines) {
   }
 }
 
-function createNode(svg, nodes, drag) {
+function createNode(svg, sysId, nodes, drag) {
 
   for (var id in nodes) {
     var node = nodes[id];
-    var textId = createNodeTextId(id);
-    var groupId = createNodeGroupId(id);
-    var p = getPosition(id);
+    var nodeName   = node.name;
+    var nodeId     = node.id;
+    var textId     = node.textId;
+    var groupId    = node.groupId;
+    var sysGroupId = node.sysGroupId;
+
+    var p = getPosition(nodeName, sysId);
     var r = node.r;
     var nodeTextPosition = createNodeTextPosition(p.x, p.y);
 
     var nodeGroup = svg.append("g")
       .attr("id", groupId)
-      .attr("class", "nodeGroup");
+      .attr("class", sysGroupId);
 
     nodeGroup.append("circle")
       .style("stroke", node.color)
       .style("fill", node.color)
       .style("fill-opacity", 0.6)
-      .attr("id", id)
+      .attr("id", nodeId)
       .attr("cx", p.x)
       .attr("cy", p.y)
-      .attr("r", r)
-      .call(drag);
+      .attr("r", r);
+
+    // drag event
+    if (drag) {
+      d3.select("circle#" + nodeId).call(drag);
+    }
 
     nodeGroup.append("a")
       .attr("xlink:href", node.link)
@@ -959,7 +1015,7 @@ function createNode(svg, nodes, drag) {
       .style("font-size", linkdraw.fontSize)
       .style("font-weight", linkdraw.fontWeight)
       .style("font-family", linkdraw.fontFamily)
-      .text(id);
+      .text(nodeName);
   }
 
 }
@@ -973,7 +1029,7 @@ function getLineNumber(pairs, a, b) {
   return 0;
 }
 
-function makePairs(lines, lineColors) {
+function makePairs(sysId, lines, lineColors) {
 
   var pairs = {};
 
@@ -987,48 +1043,45 @@ function makePairs(lines, lineColors) {
     source = pair.source;
     target = pair.target;
 
-    // rest source and target
+    // reset source and target
     line.source = source;
     line.target = target;
 
+    // create node id
+    var sourceId = createNodeId(sysId, source);
+    var targetId = createNodeId(sysId, target);
+
     // each span(node span) line count
-    var n = getLineNumber(pairs, source, target);
+    var n = getLineNumber(pairs, sourceId, targetId);
 
     // append id
     var id          = i;
-    var lineId      = createLineId(source, target, n);
-    var pathId      = createLinePathId(source, target, n);
-    var textPathId  = createLineTextPathId(source, target, n);
-    var lineTextId  = createLineTextId(source, target, n);
-    var lineGroupId = createLineGroupId(lineId);
+    var lineId      = createLineId(sysId, source, target, n);
+    var pathId      = createLinePathId(sysId, source, target, n);
+    var textPathId  = createLineTextPathId(sysId, source, target, n);
+    var lineTextId  = createLineTextId(sysId, source, target, n);
+    var lineGroupId = createLineGroupId(sysId, lineId);
+    var sysGroupId  = createSysGroupId(sysId);
     line.id          = id;
     line.lineId      = lineId;
     line.pathId      = pathId;
     line.textPathId  = textPathId;
     line.lineTextId  = lineTextId;
     line.lineGroupId = lineGroupId;
+    line.sysGroupId  = sysGroupId;
 
     // append color
     var lineColor = lineColorSelect(line.color, lineColors);
     line.color = lineColor;
 
     // add pair to pairs obj
-    addPair(pairs, source, target, line);
+    addPair(pairs, sourceId, targetId, line);
 
   }
-  cLog("# config lines #", lines);
+  cLog("# config lines #");
+  cLog(lines);
 
   return pairs;
-}
-
-function initNodeConfig(nodes, pairs) {
-  for (var source in pairs) {
-    for (var target in pairs[source]) {
-      nodes[source] = checkNode(source, nodes);
-      nodes[target] = checkNode(target, nodes);
-    }
-  }
-  return nodes;
 }
 
 function makeBind(lines) {
@@ -1049,10 +1102,10 @@ function makeBind(lines) {
   return bind;
 }
 
-function appendPosition() {
+function appendPosition(sysId) {
 
-  var pairs = linkdraw.pairs;
-  var nodes = linkdraw.nodes;
+  var pairs = linkdraw[sysId].pairs;
+  var nodes = linkdraw[sysId].nodes;
 
   for (var source in pairs) {
     for (var target in pairs[source]) {
@@ -1062,22 +1115,16 @@ function appendPosition() {
         var line = lines[i];
         var r1 = nodes[source].r;
         var r2 = nodes[target].r;
-        var p1 = getPosition(source);
-        var p2 = getPosition(target);
+        var p1 = getPosition(nodes[source].name, sysId);
+        var p2 = getPosition(nodes[target].name, sysId);
         var lineNumber = i + 1;
         var lineNumberMax = lines.length;
         var pathData = createPathData(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
         var points = createPoints(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
 
-        cLog("# ----------------- #", "");
-        cLog("# lineNumber #", lineNumber);
-        cLog("# lineNumberMax #", lineNumberMax);
-        cLog("# path data #", pathData);
-        cLog("# point data #", points);
-
         // store 
-        line["pathData"] = pathData;
-        line["points"]   = points;
+        line.pathData = pathData;
+        line.points   = points;
         pairs[source][target][i] = line;
 
       }
@@ -1085,25 +1132,25 @@ function appendPosition() {
   }
 }
 
-function zoomEvent(svg) {
+function zoomEvent(svg, sysId) {
   svg.call(d3.behavior.zoom()
     .on("zoom", function redraw() {
-      linkdraw.scale = d3.event.scale;
-      linkdraw.translate = d3.event.translate;
-      transformView();
+      linkdraw[sysId].scale = d3.event.scale;
+      linkdraw[sysId].translate = d3.event.translate;
+      transformView(sysId);
     })
   );
 }
 
-function dragEvent() {
+function dragEvent(sysId) {
   return d3.behavior.drag()
     .on("drag", function() {
 
-      var pairs = linkdraw.pairs;
-      var nodes = linkdraw.nodes;
+      var pairs = linkdraw[sysId].pairs;
+      var nodes = linkdraw[sysId].nodes;
       var dx, dy; 
       var id = this.id;
-      var zRate = zoomRate();
+      var zRate = zoomRate(sysId);
 
       if (zRate < 1) {
         dx = this.cx.baseVal.value + d3.event.dx * (zRate);
@@ -1115,21 +1162,22 @@ function dragEvent() {
       d3.select(this)
         .attr('cx', dx)
         .attr('cy', dy);
-      cLog("node position",  id);
+      cLog("node position" + id);
 
-      var textId = createNodeTextId(id);
+      var textId = nodes[id].textId;
       var nodeTextPosition = createNodeTextPosition(dx, dy);
       d3.select("text#" + textId)
         .attr('x', nodeTextPosition.x)
         .attr('y', nodeTextPosition.y);
-      cLog("text position",  d3.select("text#" + textId));
+      cLog("text position");
+      cLog(d3.select("text#" + textId));
       
       for (var source in pairs) {
         for (var target in pairs[source]) {
 
           // new position
-          var p1 = getPosition(source);
-          var p2 = getPosition(target);
+          var p1 = getPosition(nodes[source].name, sysId);
+          var p2 = getPosition(nodes[target].name, sysId);
           if (this.id == source){
             p1.x = dx;
             p1.y = dy;
@@ -1154,12 +1202,14 @@ function dragEvent() {
             var points = createPoints(r1, r2, p1.x, p1.y, p2.x, p2.y, lineNumber, lineNumberMax);
             var polyline = d3.select("polyline#" + line["lineId"]);
             polyline.attr("points", points);
-            cLog("# polyline #", polyline);
+            cLog("# polyline #");
+            cLog(polyline);
 
             // path
             var path = d3.select("path#" + line["pathId"]);
             path.attr("d", pathData);
-            cLog("# path #", path );
+            cLog("# path #");
+            cLog(path);
 
             // textpath
 
@@ -1173,7 +1223,8 @@ function dragEvent() {
             textpath
               .attr("startOffset", "50%")
               .attr("text-anchor", "middle");
-            cLog("# textpath #", textpath );
+            cLog("# textpath #");
+            cLog(textpath);
 
             // line text
             var lineText = d3.select("text#" + line["lineTextId"]);
@@ -1182,95 +1233,106 @@ function dragEvent() {
               .attr("y", "")// for Safari 5.1.7
               .attr("startOffset", "50%") // for Safari 5.1.7
               .attr("text-anchor", "middle"); // for Safari 5.1.7
-            cLog("# linetext #", lineText);
+            cLog("# linetext #");
+            cLog(lineText);
           }
        }
      }
   });
 
-
 }
 
-function drawItem(svg) {
+function drawItem(svg, sysId) {
 
   // fetch new config
-  var configJson = getJson(linkdraw.configPath);
+  var configJson = getJson(linkdraw[sysId].configPath);
 
   // keep old config and get new config
-  var _config = linkdraw.config;
-  linkdraw.config = initConfigData(configJson);
-  var config = linkdraw.config;
+  var _config = linkdraw[sysId].config;
+  linkdraw[sysId].config = initConfigData(configJson);
 
   // keep old config and get new config
-  var _nodes = linkdraw.nodes;
-  linkdraw.nodes = parseNodeConfig(config.nodes);
-  var nodes = linkdraw.nodes;
+  var _nodes = linkdraw[sysId].nodes;
+  linkdraw[sysId].nodes = parseNodeConfig(sysId, linkdraw[sysId].config.nodes);
 
   // keep old config and get new config
-  var _lines = linkdraw.lines;
-  linkdraw.lines = config.lines;
-  var lines = linkdraw.lines;
+  var _lines = linkdraw[sysId].lines;
+  linkdraw[sysId].lines = linkdraw[sysId].config.lines;
+
+  // merge node config(line node name + node config)
+  var lineNodes = extractLineNode(linkdraw[sysId].lines);
+  linkdraw[sysId].nodes = mergeNodeConfig(sysId, linkdraw[sysId].nodes, lineNodes);
 
   // for color chart
-  var lineColorConf = config.lineColors;
+  var lineColorConf = linkdraw[sysId].config.lineColors;
   var lineColors = makeLineColors(lineColorConf);
 
   // update time
-  updateTime(svg, config.time);
+  updateTime(svg, sysId, linkdraw[sysId].config.time);
 
   // update descr
-  updateDescr(svg, config.descr);
+  updateDescr(svg, sysId, linkdraw[sysId].config.descr);
 
   // color chart
-  updateLineColorChart(svg, lineColorConf, lineColors);
+  updateLineColorChart(svg, sysId, lineColorConf, lineColors);
 
   // keep old pairs and make new pairs
-  var _pairs = linkdraw.pairs;
-  linkdraw.pairs = makePairs(lines, lineColors);
-  var pairs = linkdraw.pairs;
-
-  // init node
-  nodes = initNodeConfig(nodes, pairs);
+  var _pairs = linkdraw[sysId].pairs;
+  linkdraw[sysId].pairs = makePairs(sysId, linkdraw[sysId].lines, lineColors);
 
   // add position to each lines
-  appendPosition();
+  appendPosition(sysId);
 
   // check node config diff
-  var nodeItems = getNodeConfigDiff(_nodes, nodes);
-  cLog("node config diff", nodeItems);
+  var nodeItems = getNodeConfigDiff(_nodes, linkdraw[sysId].nodes);
+  cLog("node config diff");
+  cLog(nodeItems);
 
   // check line config diff
-  var lineItems = getLineConfigDiff(lines, _lines, pairs, _pairs);
-  cLog("line config diff", lineItems);
+  var lineItems = getLineConfigDiff(linkdraw[sysId].lines, _lines, linkdraw[sysId].pairs, _pairs);
+  cLog("line config diff");
+  cLog(lineItems);
 
-  // drag event
-  var drag = dragEvent();
+  // drag
+  if (linkdraw[sysId].drag == false) {
+    // disable
+    var drag = false;
+  } else {
+    // enable(default)
+    var drag = dragEvent(sysId);
+  }
 
   // write node 
-  updateNode(svg, nodeItems, drag);
+  updateNode(svg, sysId, nodeItems, drag);
 
   // write line
   updateLine(svg, lineItems);
 
   // change zoom value
-  transformView();
+  transformView(sysId);
 
 }
 
 (function($) {
   $.fn.linkDraw = function(sys) {
 
-    // debug
-    linkdraw.debug = true;
-    linkdraw.debug = false;
+    // count system id for multiple.
+    if (linkdraw.count) {
+      linkdraw.count++;
+    } else {
+      linkdraw.count = 1;
+    }
+    sys.id = linkdraw.count;
+    var sysId = sys.id;
 
-    //system settings
-    linkdraw.configPath   = sys.config;
-    linkdraw.positionPath = sys.position;
-    linkdraw.positionSave = sys.positionSave;
-    linkdraw.width        = sys.width;
-    linkdraw.height       = sys.height;
-    linkdraw.interval     = sys.interval;
+    // keep system settings
+    linkdraw[sysId] = sys;
+
+    // keep system config values
+    linkdraw[sysId].config = {};
+    linkdraw[sysId].nodes = {};
+    linkdraw[sysId].lines = {};
+    linkdraw[sysId].pairs = {};
 
     // svg settings
     linkdraw.fontSize = "12px";
@@ -1280,39 +1342,38 @@ function drawItem(svg) {
     linkdraw.lineColor = "#666";
     linkdraw.nodeColor = "#666";
     linkdraw.nodeR = 4;
-    linkdraw.config = {};
-    linkdraw.nodes = {};
-    linkdraw.lines = {};
-    linkdraw.pairs = {};
-
-    // get json data
-    var configJson   = getJson(linkdraw.configPath);
-    var positionJson = getJson(linkdraw.positionPath);
 
     // init position data
-    linkdraw.position  = initPositionData(positionJson);
-    linkdraw.scale     = initScaleData(positionJson);
-    linkdraw.translate = initTranslateData(positionJson);
+    var positionJson = getJson(linkdraw[sysId].positionPath);
+    linkdraw[sysId].position  = initPositionData(positionJson);
+    linkdraw[sysId].scale     = initScaleData(positionJson);
+    linkdraw[sysId].translate = initTranslateData(positionJson);
 
     // create svg
-    var svg = createSVG(this.selector);
+    var svg = createSVG(this.selector, sys);
 
     // position save button
-    if (linkdraw.positionSave == false) {
-      // defult enable
+    if (sys.positionSave == false) {
+      // disable
     } else {
-      createSaveButton(svg, linkdraw.positionPath);
+      // enable(default)
+      createSaveButton(svg, sysId);
     }
 
     // zoom
-    zoomEvent(svg);
+    if (sys.zoom == false) {
+      // disable
+    } else {
+      // enable(default)
+      zoomEvent(svg, sysId);
+    }
 
     // draw
-    drawItem(svg);
-    if (linkdraw.interval > 0) {
+    drawItem(svg, sysId);
+    if (sys.interval > 0) {
       setInterval(function() {
-        drawItem(svg);
-      }, 1000 * linkdraw.interval);
+        drawItem(svg, sysId);
+      }, 1000 * sys.interval);
     }
   }
 

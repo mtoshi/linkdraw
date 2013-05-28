@@ -1,7 +1,7 @@
 {
-    "time": "2013-05-23 15:45:45",
+    "time": "20XX-01-23 01:23:45",
 
-    "descr": "This is linkdraw sample",
+    "descr": "This is linkdraw sample11",
 
     "lineColors": [
         { "id": "LV5", "descr": "100-80%", "color": "#A52A2A" },
@@ -13,9 +13,6 @@
     ],
 
     "nodes": [
-        { "name": "A", "r": "6", "color": "red", "link": "" },
-        { "name": "B", "r": "6", "color": "red", "link": "" },
-        { "name": "C", "r": "6", "color": "red", "link": "" },
         { "name": "TRANSIT-A", "r": "6", "color": "#CD5C5C", "link": "" },
         { "name": "TRANSIT-B", "r": "6", "color": "#CD5C5C", "link": "" },
         { "name": "TRANSIT-C", "r": "6", "color": "#CD5C5C", "link": "" },

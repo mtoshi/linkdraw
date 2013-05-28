@@ -1,0 +1,10 @@
+{
+    "lines": [
+        { "source": "A", "target": "B","color": "#6495ED", "width": "1", "descr": "", "link": "" },
+        { "source": "B", "target": "C","color": "#6495ED", "width": "1", "descr": "", "link": "" },
+        { "source": "C", "target": "D","color": "#6495ED", "width": "1", "descr": "", "link": "" },
+        { "source": "A", "target": "D","color": "#6495ED", "width": "1", "descr": "", "link": "" },
+        { "source": "A", "target": "D","color": "#6495ED", "width": "1", "descr": "", "link": "" }
+    ]
+}
+	

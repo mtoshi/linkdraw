@@ -1,0 +1,31 @@
+{
+    "time": "20XX-01-23 01:23:45",
+
+    "descr": "This is linkdraw sample9",
+
+    "lineColors": [
+        { "id": "LV3", "descr": "80-100%", "color": "#A52A2A" },
+        { "id": "LV2", "descr": "40-80%" , "color": "#FF8C00" },
+        { "id": "LV1", "descr": "0-40%"  , "color": "#00688B" }
+    ],
+    
+    "nodes": [
+        { "name": "A", "r": "6", "color": "#5F9EA0", "link": "" },
+        { "name": "B", "r": "6", "color": "#5F9EA0", "link": "" },
+        { "name": "C", "r": "6", "color": "#5F9EA0", "link": "" },
+        { "name": "D", "r": "6", "color": "#5F9EA0", "link": "" },
+        { "name": "E", "r": "6", "color": "#5F9EA0", "link": "" },
+        { "name": "F", "r": "6", "color": "#5F9EA0", "link": "" }
+    ],
+
+    "lines": [
+        { "source": "A", "target": "B","color": "LV1", "width": "1", "descr": "1", "link": "" },
+        { "source": "B", "target": "C","color": "LV1", "width": "1", "descr": "2", "link": "" },
+        { "source": "C", "target": "D","color": "LV2", "width": "1", "descr": "3", "link": "" },
+        { "source": "D", "target": "E","color": "LV2", "width": "1", "descr": "4", "link": "" },
+        { "source": "E", "target": "F","color": "LV3", "width": "1", "descr": "5", "link": "" },
+        { "source": "F", "target": "A","color": "LV3", "width": "1", "descr": "6", "link": "" },
+        { "source": "B", "target": "E","color": "LV1", "width": "1", "descr": "7", "link": "" }
+    ]
+}
+	

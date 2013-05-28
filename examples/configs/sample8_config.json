@@ -1,0 +1,21 @@
+{
+    "nodes": [
+        { "name": "A", "r": "4", "color": "#CD5C5C", "link": "" },
+        { "name": "B", "r": "4", "color": "#CD5C5C", "link": "" },
+        { "name": "C", "r": "4", "color": "#CD5C5C", "link": "" },
+        { "name": "D", "r": "4", "color": "#CD5C5C", "link": "" },
+        { "name": "E", "r": "4", "color": "#4682B4", "link": "" },
+        { "name": "F", "r": "4", "color": "#4682B4", "link": "" }
+    ],
+
+    "lines": [
+        { "source": "A", "target": "B","color": "#6495ED", "width": "1", "descr": "1", "link": "" },
+        { "source": "B", "target": "C","color": "#B22222", "width": "1", "descr": "2", "link": "" },
+        { "source": "C", "target": "D","color": "#2E8B57", "width": "1", "descr": "3", "link": "" },
+        { "source": "A", "target": "D","color": "#FF8C00", "width": "1", "descr": "4", "link": "" },
+        { "source": "A", "target": "D","color": "#DB7093", "width": "1", "descr": "5", "link": "" },
+        { "source": "B", "target": "F","color": "#4169E1", "width": "1", "descr": "6", "link": "" },
+        { "source": "F", "target": "E","color": "#5F9EA0", "width": "1", "descr": "7", "link": "" }
+    ]
+}
+	
