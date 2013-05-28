@@ -3,7 +3,7 @@ $(function(){
      "configPath": "configs/sample12_config.json", 
      "positionPath": "positions/sample12_position.json", 
      "positionWriter": "write.cgi",
-     //"positionSave": false,
+     "positionSave": false,
      //"zoom": false,
      //"drag": false,
      "width": 800,
