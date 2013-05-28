@@ -1,0 +1,97 @@
+{
+    "time": "20XX-01-23 01:23:45",
+
+    "descr": "This is linkdraw sample12",
+
+    "lineColors": [
+        { "id": "LV5", "descr": "100-80%", "color": "#A52A2A" },
+        { "id": "LV4", "descr": "80-60%", "color": "#FF8C00" },
+        { "id": "LV3", "descr": "60-40%", "color": "#548B54" },
+        { "id": "LV2", "descr": "40-20%", "color": "#00688B" },
+        { "id": "LV1", "descr": "20-0%", "color": "#4F94CD" },
+        { "id": "LV0", "descr": "DOWN", "color": "#AAAAAA" }
+    ],
+
+    "nodes": [
+
+        { "name": "Internet", "r": "12", "color": "#4682B4", "link": "" },
+
+        { "name": "A1", "r": "4", "color": "#4682B4", "link": "" },
+        { "name": "A2", "r": "4", "color": "#4682B4", "link": "" },
+
+
+        { "name": "B1", "r": "4", "color": "#4682B4", "link": "" },
+        { "name": "B2", "r": "4", "color": "#4682B4", "link": "" },
+
+
+        { "name": "C1", "r": "4", "color": "#4682B4", "link": "" },
+        { "name": "C2", "r": "4", "color": "#4682B4", "link": "" }
+    ],
+
+    "lines": [
+
+        { "source": "Internet", "target": "A1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "Internet", "target": "A2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "Internet", "target": "B1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "Internet", "target": "B2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "Internet", "target": "C1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "Internet", "target": "C2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+
+
+        { "source": "A1",   "target": "A1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "A1",   "target": "A1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "A2",   "target": "A1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "A2",   "target": "A1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "A1-1", "target": "A1-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-1", "target": "A1-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-1", "target": "A1-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-1", "target": "A1-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+
+        { "source": "A1-2", "target": "A2-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-2", "target": "A2-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-2", "target": "A2-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "A1-2", "target": "A2-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+
+
+
+        { "source": "B1",   "target": "B1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "B1",   "target": "B1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "B2",   "target": "B1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "B2",   "target": "B1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "B1-1", "target": "B1-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "B1-1", "target": "B1-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "B1-1", "target": "B1-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "B1-1", "target": "B1-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+
+        { "source": "B1-2", "target": "B2-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "B1-2", "target": "B2-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "B1-2", "target": "B2-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "B1-2", "target": "B2-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+
+
+        { "source": "C1",   "target": "C1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "C1",   "target": "C1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "C2",   "target": "C1-1","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "C2",   "target": "C1-2","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+
+        { "source": "C1-1", "target": "C1-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "C1-1", "target": "C1-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "C1-1", "target": "C1-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "C1-1", "target": "C1-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+
+        { "source": "C1-2", "target": "C2-S1","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "C1-2", "target": "C2-S2","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "C1-2", "target": "C2-S3","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "C1-2", "target": "C2-S4","color": "LV1", "width": "1", "descr": "1G", "link": "" }
+
+    ]
+}
+	
