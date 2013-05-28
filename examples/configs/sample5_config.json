@@ -1,0 +1,12 @@
+{
+    "descr": "sample5",
+
+    "lines": [
+        { "source": "A", "target": "B","color": "#6495ED", "width": "1", "descr": "1", "link": "" },
+        { "source": "B", "target": "C","color": "#B22222", "width": "1", "descr": "2", "link": "" },
+        { "source": "C", "target": "D","color": "#2E8B57", "width": "1", "descr": "3", "link": "" },
+        { "source": "A", "target": "D","color": "#FF8C00", "width": "1", "descr": "4", "link": "" },
+        { "source": "A", "target": "D","color": "#DB7093", "width": "1", "descr": "5", "link": "" }
+    ]
+}
+	

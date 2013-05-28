@@ -537,9 +537,9 @@ function getLineConfigDiff(linesNew, linesOld, pairsNew, pairsOld) {
   
 }
 
-function updateTime(svg, time) {
+function updateTime(svg, sysId, time) {
 
-  var id = "time";
+  var id = "sys_time_" + sysId;
 
   // delete time
   d3.select("text#" + id).remove();
@@ -548,9 +548,9 @@ function updateTime(svg, time) {
   createText(svg, id, time, "10", "20");
 }
 
-function updateDescr(svg, descr) {
+function updateDescr(svg, sysId, descr) {
 
-  var id = "descr";
+  var id = "sys_descr_" + sysId;
 
   // delete descr
   d3.select("text#" + id).remove();
@@ -1258,10 +1258,10 @@ function drawItem(svg, sysId) {
   var lineColors = makeLineColors(lineColorConf);
 
   // update time
-  updateTime(svg, linkdraw[sysId].config.time);
+  updateTime(svg, sysId, linkdraw[sysId].config.time);
 
   // update descr
-  updateDescr(svg, linkdraw[sysId].config.descr);
+  updateDescr(svg, sysId, linkdraw[sysId].config.descr);
 
   // color chart
   updateLineColorChart(svg, sysId, lineColorConf, lineColors);

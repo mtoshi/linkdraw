@@ -5,42 +5,12 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="js/linkdraw.js"></script>
-
-<script type="text/javascript">
-  $(function(){
-     $("#sample1").linkDraw({
-       "configPath": "configs/sample1_config.json", 
-       "positionPath": "positions/sample1_position.json", 
-       "positionWriter": "write.cgi",
-       "positionSave": false,
-       "zoom": false,
-       "drag": false,
-       "width": 200,
-       "height": 200,
-       "interval":10 
-     });
-  });
-</script>
-
-<script type="text/javascript">
-  $(function(){
-     $("#sample2").linkDraw({
-       "configPath": "configs/sample2_config.json", 
-       "positionPath": "positions/sample2_position.json", 
-       "positionWriter": "write.cgi",
-       "positionMove": false,
-       "positionSave": false,
-       //"zoom": false,
-       //"drag": false,
-       "width": 200,
-       "height": 200,
-       "interval": 10
-     });
-  });
-</script>
-
-
-
+<script type="text/javascript" src="js/sample1.js"></script>
+<script type="text/javascript" src="js/sample2.js"></script>
+<script type="text/javascript" src="js/sample3.js"></script>
+<script type="text/javascript" src="js/sample4.js"></script>
+<script type="text/javascript" src="js/sample5.js"></script>
+<script type="text/javascript" src="js/sample6.js"></script>
 <title>Linkdraw</title>
 </head>
 <body>
@@ -50,8 +20,18 @@
   </div>
   
   <div id="container">
-    <div id="sample1"></div>
-    <div id="sample2"></div>
+    <table>
+      <tr>
+        <td><div id="sample1"></div></td>
+        <td><div id="sample2"></div></td>
+        <td><div id="sample3"></div></td>
+      </tr>
+      <tr>
+        <td><div id="sample4"></div></td>
+        <td><div id="sample5"></div></td>
+        <td><div id="sample6"></div></td>
+      </tr>
+    </table>
   </div>
   
   <div id="footer">

@@ -24,6 +24,12 @@ h1 {
   padding: 8px;
   margin: 0; 
 }
+#container table{
+  margin-top: 4px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 4px;
+}
 #footer{
   width: 100%; 
   color: #FFF;
