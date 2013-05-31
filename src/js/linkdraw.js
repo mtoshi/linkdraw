@@ -1133,13 +1133,15 @@ function appendPosition(sysId) {
 }
 
 function zoomEvent(svg, sysId) {
-  svg.call(d3.behavior.zoom()
-    .on("zoom", function redraw() {
-      linkdraw[sysId].scale = d3.event.scale;
-      linkdraw[sysId].translate = d3.event.translate;
-      transformView(sysId);
-    })
-  );
+  svg.on("click", function(){
+    svg.call(d3.behavior.zoom()
+      .on("zoom", function redraw() {
+        linkdraw[sysId].scale = d3.event.scale;
+        linkdraw[sysId].translate = d3.event.translate;
+        transformView(sysId);
+      })
+    );
+  });
 }
 
 function dragEvent(sysId) {
