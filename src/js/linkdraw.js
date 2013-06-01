@@ -865,45 +865,53 @@ function createText(svg, id, update, x, y) {
 
 function updateLineColorChart(svg, sysId, colors, lineColors) {
 
-  // padding
-  var padding_left = 10;
-
-  // html class for remove and create 
-  var class_rect = "color_chart_rect" + sysId;
-  var class_text = "color_chart_text" + sysId;
+  // margin
+  var margin_top    = 100;
+  var margin_left   = 10;
+  var margin_bottom = 4;
 
   // color box height and width
   var color_chart_box_height = 20;
-  var color_chart_box_width  = 100;
+  var color_chart_box_width  = 10;
+
+  // html class for remove and create 
+  var class_line_color_chart = "line_color_chart" + sysId;
 
   // remove
-  d3.selectAll("." + class_text).remove();
-  d3.selectAll("." + class_rect).remove();
+  d3.selectAll("." + class_line_color_chart).remove();
 
   // create
   if (colors) {
+
+    // chart title
+    svg.append("text")
+      .attr("class", class_line_color_chart)
+        .attr("x", margin_left + "px")
+        .attr("y", margin_top + "px")
+        .text("Line Color Chart");
+
+    // chart item
     for (var i in colors) {
-      var y = color_chart_box_height * i + 80;
-      var _y = y + 4; // for padding bottom
+      var y = color_chart_box_height * i + margin_top;
+      var _y = y + margin_bottom;
       svg.append("rect")
-        .attr("class", class_rect)
+        .attr("class", class_line_color_chart)
         .attr("width", color_chart_box_width + "px")
         .attr("height", color_chart_box_height + "px")
-        .attr("x", padding_left + "px")
+        .attr("x", margin_left + "px")
         .attr("y", _y + "px")
         .attr("fill", colors[i].color);
 
       _y = y + color_chart_box_height;
+      var text_left_space = 4;
       svg.append("text")
-        .attr("class", class_text)
-        .attr("x", color_chart_box_width / 2 + padding_left + "px")
+        .attr("class", class_line_color_chart)
+        .attr("x", color_chart_box_width + margin_left + text_left_space + "px")
         .attr("y", _y + "px")
-        .attr("startOffset", "50%")
-        .attr("text-anchor", "middle")
         .style("font-size", linkdraw.fontSize)
         .style("font-weight", linkdraw.fontWeight)
         .style("font-family", linkdraw.fontFamily)
-        .style("fill", "#FFF")
+        .style("fill", linkdraw.fontColor)
         .text(colors[i].descr);
     }
     cLog("# color check");
