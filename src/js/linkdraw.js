@@ -863,7 +863,7 @@ function createText(svg, id, update, x, y) {
   }
 }
 
-function updateLineColorChart(svg, sysId, colors, lineColors) {
+function updateLineColorChart(svg, sysId, colors) {
 
   // margin
   var margin_top    = 100;
@@ -888,7 +888,7 @@ function updateLineColorChart(svg, sysId, colors, lineColors) {
       .attr("class", class_line_color_chart)
         .attr("x", margin_left + "px")
         .attr("y", margin_top + "px")
-        .text("Line Color Chart");
+        .text("Line Colors");
 
     // chart item
     for (var i in colors) {
@@ -1283,8 +1283,8 @@ function drawItem(svg, sysId) {
   // update descr
   updateDescr(svg, sysId, linkdraw[sysId].config.descr);
 
-  // color chart
-  updateLineColorChart(svg, sysId, lineColorConf, lineColors);
+  // line color chart
+  updateLineColorChart(svg, sysId, lineColorConf);
 
   // keep old pairs and make new pairs
   var _pairs = linkdraw[sysId].pairs;
