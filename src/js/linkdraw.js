@@ -1438,9 +1438,6 @@ function updateItem(svg, sysId, configJson) {
     linkdraw[sysId].scale     = initScaleData(positionJson);
     linkdraw[sysId].translate = initTranslateData(positionJson);
 
-    console.log("test", linkdraw[sysId].scale);
-    console.log("test", linkdraw[sysId].translate);
-
     // create svg
     var svg = createSVG(this.selector, sys);
 
