@@ -322,14 +322,6 @@ function transformView(sysId) {
     .attr("transform", "translate(" + linkdraw[sysId].translate + ")" + " scale(" + linkdraw[sysId].scale + ")");
 }
 
-function zoomRate(sysId) {
-  if (linkdraw[sysId].scale >= 1){
-    return 1;
-  } else {
-    return 1 + 1 - linkdraw[sysId].scale;
-  }
-}
-
 function makeLineColors(colors) {
   obj = {};
   for (var i in colors) {
@@ -399,6 +391,7 @@ function initConfigData(obj) {
     return { 
       "time": "",
       "descr": "",
+      "nodeColors": [],
       "lineColors": [],
       "nodes": [],
       "lines": []
@@ -454,12 +447,16 @@ function extractLineNode(lines){
   return nodes;
 }
 
-function parseNodeConfig(sysId, nodes) {
+function parseNodeConfig(sysId, nodes, nodeColors) {
   var x = {};
   if (nodes) {
     for (var i=0; i<nodes.length; i++) {
       var node = nodes[i];
       var nodeName = node.name;
+      var color = node.color;
+      if (nodeColors[color]) {
+        node.color = nodeColors[color];
+      }
       x[nodeName] = node;
     }
   }
@@ -849,6 +846,14 @@ function createSaveButton(svg, sysId) {
 
 }
 
+function countColor(colors){
+  var n = 0;
+  for (var i in colors) {
+    n++; 
+  }
+  return n;
+}
+
 function createText(svg, id, update, x, y) {
   if (update) {
     svg.append("text")
@@ -863,50 +868,110 @@ function createText(svg, id, update, x, y) {
   }
 }
 
-function updateLineColorChart(svg, sysId, colors, lineColors) {
+function updateNodeColorChart(svg, sysId, colors, marginTop) {
 
-  // padding
-  var padding_left = 10;
+  // margin
+  var marginLeft   = 10;
+  var marginBottom = 8;
+
+  // color circle r
+  var r = 6;
 
   // html class for remove and create 
-  var class_rect = "color_chart_rect" + sysId;
-  var class_text = "color_chart_text" + sysId;
-
-  // color box height and width
-  var color_chart_box_height = 20;
-  var color_chart_box_width  = 100;
+  var class_name = "node_color_chart" + sysId;
 
   // remove
-  d3.selectAll("." + class_text).remove();
-  d3.selectAll("." + class_rect).remove();
+  d3.selectAll("." + class_name).remove();
 
   // create
   if (colors) {
-    for (var i in colors) {
-      var y = color_chart_box_height * i + 80;
-      var _y = y + 4; // for padding bottom
-      svg.append("rect")
-        .attr("class", class_rect)
-        .attr("width", color_chart_box_width + "px")
-        .attr("height", color_chart_box_height + "px")
-        .attr("x", padding_left + "px")
-        .attr("y", _y + "px")
-        .attr("fill", colors[i].color);
 
-      _y = y + color_chart_box_height;
+    // chart title
+    svg.append("text")
+      .attr("class", class_name)
+        .attr("x", marginLeft + "px")
+        .attr("y", marginTop + "px")
+        .text("Node Colors");
+
+    // chart item
+    for (var i in colors) {
+      var y = r * 3 * i + marginTop + marginBottom;
+      svg.append("circle")
+        .attr("class", class_name)
+        .attr("r", r + "px")
+        .attr("cx", r + marginLeft + "px")
+        .attr("cy", r + y + "px")
+        .attr("fill-opacity", 0.6)
+        .attr("fill", colors[i].color)
+        .style("stroke", colors[i].color);
+
+      var text_left_space = 4;
       svg.append("text")
-        .attr("class", class_text)
-        .attr("x", color_chart_box_width / 2 + padding_left + "px")
-        .attr("y", _y + "px")
-        .attr("startOffset", "50%")
-        .attr("text-anchor", "middle")
+        .attr("class", class_name)
+        .attr("x", r * 2 + marginLeft + text_left_space + "px")
+        .attr("y", y + 10 + "px")
         .style("font-size", linkdraw.fontSize)
         .style("font-weight", linkdraw.fontWeight)
         .style("font-family", linkdraw.fontFamily)
-        .style("fill", "#FFF")
+        .style("fill", linkdraw.fontColor)
         .text(colors[i].descr);
     }
-    cLog("# color check");
+    cLog("# node color check");
+    cLog(colors);
+  }
+}
+
+function updateLineColorChart(svg, sysId, colors, marginTop) {
+
+  // margin
+  var marginLeft   = 10;
+  var marginBottom = 4;
+
+  // color box height and width
+  var colorChartBoxHeight = 20;
+  var colorChartBoxWidth  = 10;
+
+  // html class for remove and create 
+  var class_line_color_chart = "line_color_chart" + sysId;
+
+  // remove
+  d3.selectAll("." + class_line_color_chart).remove();
+
+  // create
+  if (colors) {
+
+    // chart title
+    svg.append("text")
+      .attr("class", class_line_color_chart)
+        .attr("x", marginLeft + "px")
+        .attr("y", marginTop + "px")
+        .text("Line Colors");
+
+    // chart item
+    for (var i in colors) {
+      var y = colorChartBoxHeight * i + marginTop;
+      var _y = y + marginBottom;
+      svg.append("rect")
+        .attr("class", class_line_color_chart)
+        .attr("width", colorChartBoxWidth + "px")
+        .attr("height", colorChartBoxHeight + "px")
+        .attr("x", marginLeft + "px")
+        .attr("y", _y + "px")
+        .attr("fill", colors[i].color);
+
+      _y = y + colorChartBoxHeight;
+      var text_left_space = 4;
+      svg.append("text")
+        .attr("class", class_line_color_chart)
+        .attr("x", colorChartBoxWidth + marginLeft + text_left_space + "px")
+        .attr("y", _y + "px")
+        .style("font-size", linkdraw.fontSize)
+        .style("font-weight", linkdraw.fontWeight)
+        .style("font-family", linkdraw.fontFamily)
+        .style("fill", linkdraw.fontColor)
+        .text(colors[i].descr);
+    }
+    cLog("# line color check");
     cLog(colors);
   }
 }
@@ -1133,13 +1198,19 @@ function appendPosition(sysId) {
 }
 
 function zoomEvent(svg, sysId) {
-  svg.call(d3.behavior.zoom()
-    .on("zoom", function redraw() {
-      linkdraw[sysId].scale = d3.event.scale;
-      linkdraw[sysId].translate = d3.event.translate;
-      transformView(sysId);
-    })
-  );
+  svg.on("click", function(){
+    svg.call(d3.behavior.zoom()
+      .scale(linkdraw[sysId].scale)
+      .translate(linkdraw[sysId].translate)
+      .on("zoom", function redraw() {
+
+        linkdraw[sysId].scale = d3.event.scale;
+        linkdraw[sysId].translate = d3.event.translate;
+
+        transformView(sysId);
+      })
+    );
+  });
 }
 
 function dragEvent(sysId) {
@@ -1150,15 +1221,10 @@ function dragEvent(sysId) {
       var nodes = linkdraw[sysId].nodes;
       var dx, dy; 
       var id = this.id;
-      var zRate = zoomRate(sysId);
 
-      if (zRate < 1) {
-        dx = this.cx.baseVal.value + d3.event.dx * (zRate);
-        dy = this.cy.baseVal.value + d3.event.dy * (zRate);
-      } else {
-        dx = this.cx.baseVal.value + d3.event.dx;
-        dy = this.cy.baseVal.value + d3.event.dy;
-      }
+      dx = this.cx.baseVal.value + d3.event.dx;
+      dy = this.cy.baseVal.value + d3.event.dy;
+
       d3.select(this)
         .attr('cx', dx)
         .attr('cy', dy);
@@ -1247,13 +1313,29 @@ function drawItem(svg, sysId) {
   // fetch new config
   var configJson = getJson(linkdraw[sysId].configPath);
 
+  // update svg items
+  if (configJson) {
+    updateItem(svg, sysId, configJson);
+  }
+
+}
+
+function updateItem(svg, sysId, configJson) {
+
+  // fetch new config
+  var configJson = getJson(linkdraw[sysId].configPath);
+
   // keep old config and get new config
   var _config = linkdraw[sysId].config;
   linkdraw[sysId].config = initConfigData(configJson);
 
+  // node colors
+  var nodeColorConf = linkdraw[sysId].config.nodeColors;
+  var nodeColors = makeLineColors(nodeColorConf);
+
   // keep old config and get new config
   var _nodes = linkdraw[sysId].nodes;
-  linkdraw[sysId].nodes = parseNodeConfig(sysId, linkdraw[sysId].config.nodes);
+  linkdraw[sysId].nodes = parseNodeConfig(sysId, linkdraw[sysId].config.nodes, nodeColors);
 
   // keep old config and get new config
   var _lines = linkdraw[sysId].lines;
@@ -1273,8 +1355,18 @@ function drawItem(svg, sysId) {
   // update descr
   updateDescr(svg, sysId, linkdraw[sysId].config.descr);
 
-  // color chart
-  updateLineColorChart(svg, sysId, lineColorConf, lineColors);
+  // margin for layout
+  var marginTop = 100;
+
+  // line color chart
+  updateLineColorChart(svg, sysId, lineColorConf, marginTop);
+
+  // margin for layout
+  var nodeColorSize = countColor(lineColorConf);
+  marginTop = marginTop + nodeColorSize * 26;
+
+  // node color chart
+  updateNodeColorChart(svg, sysId, nodeColorConf, marginTop);
 
   // keep old pairs and make new pairs
   var _pairs = linkdraw[sysId].pairs;
@@ -1307,9 +1399,6 @@ function drawItem(svg, sysId) {
 
   // write line
   updateLine(svg, lineItems);
-
-  // change zoom value
-  transformView(sysId);
 
 }
 
@@ -1370,6 +1459,10 @@ function drawItem(svg, sysId) {
 
     // draw
     drawItem(svg, sysId);
+ 
+    // reflect before zoom scale
+    transformView(sysId);
+
     if (sys.interval > 0) {
       setInterval(function() {
         drawItem(svg, sysId);
