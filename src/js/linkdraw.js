@@ -1322,6 +1322,18 @@ function drawItem(svg, sysId) {
   // fetch new config
   var configJson = getJson(linkdraw[sysId].configPath);
 
+  // update svg items
+  if (configJson) {
+    updateItem(svg, sysId, configJson);
+  }
+
+}
+
+function updateItem(svg, sysId, configJson) {
+
+  // fetch new config
+  var configJson = getJson(linkdraw[sysId].configPath);
+
   // keep old config and get new config
   var _config = linkdraw[sysId].config;
   linkdraw[sysId].config = initConfigData(configJson);
