@@ -12,10 +12,6 @@
         { "id": "LV0", "descr": "DOWN", "color": "#AAAAAA" }
     ],
 
-    "nodes": [
-
-    ],
-
     "lines": [
 
         { "source": "AS64512", "target": "AS64615","color": "LV1", "width": "1", "descr": "", "link": "" },
