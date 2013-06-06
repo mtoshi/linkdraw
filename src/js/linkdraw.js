@@ -1200,12 +1200,14 @@ function appendPosition(sysId) {
 function zoomEvent(svg, sysId) {
   svg.on("click", function(){
     svg.call(d3.behavior.zoom()
+      .scale(linkdraw[sysId].scale)
+      .translate(linkdraw[sysId].translate)
       .on("zoom", function redraw() {
+
         linkdraw[sysId].scale = d3.event.scale;
         linkdraw[sysId].translate = d3.event.translate;
-        var sysGroupId = createSysGroupId(sysId);
-        d3.selectAll("." + sysGroupId)
-          .attr("transform", "translate(" + linkdraw[sysId].translate + ")" + " scale(" + linkdraw[sysId].scale + ")");
+
+        transformView(sysId);
       })
     );
   });
@@ -1436,6 +1438,9 @@ function updateItem(svg, sysId, configJson) {
     linkdraw[sysId].scale     = initScaleData(positionJson);
     linkdraw[sysId].translate = initTranslateData(positionJson);
 
+    console.log("test", linkdraw[sysId].scale);
+    console.log("test", linkdraw[sysId].translate);
+
     // create svg
     var svg = createSVG(this.selector, sys);
 
@@ -1457,6 +1462,10 @@ function updateItem(svg, sysId, configJson) {
 
     // draw
     drawItem(svg, sysId);
+ 
+    // reflect before zoom scale
+    transformView(sysId);
+
     if (sys.interval > 0) {
       setInterval(function() {
         drawItem(svg, sysId);
