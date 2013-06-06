@@ -322,14 +322,6 @@ function transformView(sysId) {
     .attr("transform", "translate(" + linkdraw[sysId].translate + ")" + " scale(" + linkdraw[sysId].scale + ")");
 }
 
-function zoomRate(sysId) {
-  if (linkdraw[sysId].scale >= 1){
-    return 1;
-  } else {
-    return 1 + 1 - linkdraw[sysId].scale;
-  }
-}
-
 function makeLineColors(colors) {
   obj = {};
   for (var i in colors) {
@@ -1211,7 +1203,9 @@ function zoomEvent(svg, sysId) {
       .on("zoom", function redraw() {
         linkdraw[sysId].scale = d3.event.scale;
         linkdraw[sysId].translate = d3.event.translate;
-        transformView(sysId);
+        var sysGroupId = createSysGroupId(sysId);
+        d3.selectAll("." + sysGroupId)
+          .attr("transform", "translate(" + linkdraw[sysId].translate + ")" + " scale(" + linkdraw[sysId].scale + ")");
       })
     );
   });
@@ -1225,15 +1219,10 @@ function dragEvent(sysId) {
       var nodes = linkdraw[sysId].nodes;
       var dx, dy; 
       var id = this.id;
-      var zRate = zoomRate(sysId);
 
-      if (zRate < 1) {
-        dx = this.cx.baseVal.value + d3.event.dx * (zRate);
-        dy = this.cy.baseVal.value + d3.event.dy * (zRate);
-      } else {
-        dx = this.cx.baseVal.value + d3.event.dx;
-        dy = this.cy.baseVal.value + d3.event.dy;
-      }
+      dx = this.cx.baseVal.value + d3.event.dx;
+      dy = this.cy.baseVal.value + d3.event.dy;
+
       d3.select(this)
         .attr('cx', dx)
         .attr('cy', dy);
@@ -1408,9 +1397,6 @@ function updateItem(svg, sysId, configJson) {
 
   // write line
   updateLine(svg, lineItems);
-
-  // change zoom value
-  transformView(sysId);
 
 }
 
