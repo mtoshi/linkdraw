@@ -13,11 +13,15 @@ def write_file(path, str):
      f.close
      os.chmod(path, 0666)
 
-def template(time, descr, colors, nodes, lines):
+def template(time, descr, node_colors, line_colors, nodes, lines):
     return """{
     "time": "%s",
 
     "descr": "%s",
+
+    "nodeColors": [
+%s
+    ],
 
     "lineColors": [
 %s
@@ -34,7 +38,8 @@ def template(time, descr, colors, nodes, lines):
 	""" % (
         time, 
         descr, 
-        ",\n".join(colors), 
+        ",\n".join(node_colors), 
+        ",\n".join(line_colors), 
         ",\n".join(nodes), 
         ",\n".join(lines)
         )
@@ -58,7 +63,19 @@ def line(source, target, color, width, descr, link):
             '"color": "%s", "width": "%s", "descr": "%s", "link": "%s" }') % (
             indent, source, target, color, width, descr, link)
 
-def sample_colors():
+def sample_node_colors():
+    return [
+
+        color("TRANSIT", "Transit", "#A52A2A"),
+        color("PEER",    "Peer",    "#2E8B57"),
+        color("ROUTER",  "Router",  "#00688B"),
+        color("SWITCH",  "Switch",  "#4F94CD"),
+        color("SERVER",  "Server",  "#104E8B"),
+        color("CACHE",   "Cache",   "#FF8C00"),
+
+    ]
+
+def sample_line_colors():
     return [
 
         color("LV5", "100-80%", "#A52A2A"),
@@ -74,38 +91,44 @@ def sample_colors():
 def sample_nodes():
     return [
 
-        node("TRANSIT-A", "6", "#CD5C5C", ""),
-        node("TRANSIT-B", "6", "#CD5C5C", ""),
-        node("TRANSIT-C", "6", "#CD5C5C", ""),
+        node("TRANSIT-A", "6", "TRANSIT", ""),
+        node("TRANSIT-B", "6", "TRANSIT", ""),
+        node("TRANSIT-C", "6", "TRANSIT", ""),
 
-        node("PEER-A", "6", "#2E8B57", ""),
-        node("PEER-B", "6", "#2E8B57", ""),
-        node("PEER-C", "6", "#2E8B57", ""),
-        node("PEER-D", "6", "#2E8B57", ""),
+        node("PEER-A", "6", "PEER", ""),
+        node("PEER-B", "6", "PEER", ""),
+        node("PEER-C", "6", "PEER", ""),
+        node("PEER-D", "6", "PEER", ""),
 
-        node("RouterA", "6", "#00688B", ""),
-        node("RouterB", "6", "#00688B", ""),
-        node("RouterC", "6", "#00688B", ""),
-        node("RouterD", "6", "#00688B", ""),
+        node("RouterA", "6", "ROUTER", ""),
+        node("RouterB", "6", "ROUTER", ""),
+        node("RouterC", "6", "ROUTER", ""),
+        node("RouterD", "6", "ROUTER", ""),
 
-        node("SW-A", "6", "#4F94CD", ""),
-        node("SW-B", "6", "#4F94CD", ""),
+        node("RouterE", "6", "ROUTER", ""),
+        node("RouterF", "6", "ROUTER", ""),
 
-        node("WEB-A", "6", "#104E8B", ""),
-        node("WEB-B", "6", "#104E8B", ""),
+        node("RouterX", "6", "ROUTER", ""),
+        node("RouterY", "6", "ROUTER", ""),
 
-        node("MAIL-A", "6", "#104E8B", ""),
-        node("MAIL-B", "6", "#104E8B", ""),
+        node("SW-A", "6", "SWITCH", ""),
+        node("SW-B", "6", "SWITCH", ""),
 
-        node("DNS-A", "6", "#104E8B", ""),
-        node("DNS-B", "6", "#104E8B", ""),
+        node("WEB-A", "6", "SERVER", ""),
+        node("WEB-B", "6", "SERVER", ""),
 
-        node("CACHE-A", "6", "#FF8C00", ""),
-        node("CACHE-B", "6", "#FF8C00", ""),
-        node("CACHE-C", "6", "#FF8C00", ""),
-        node("CACHE-D", "6", "#FF8C00", ""),
-        node("CACHE-E", "6", "#FF8C00", ""),
-        node("CACHE-F", "6", "#FF8C00", ""),
+        node("MAIL-A", "6", "SERVER", ""),
+        node("MAIL-B", "6", "SERVER", ""),
+
+        node("DNS-A", "6", "SERVER", ""),
+        node("DNS-B", "6", "SERVER", ""),
+
+        node("CACHE-A", "6", "CACHE", ""),
+        node("CACHE-B", "6", "CACHE", ""),
+        node("CACHE-C", "6", "CACHE", ""),
+        node("CACHE-D", "6", "CACHE", ""),
+        node("CACHE-E", "6", "CACHE", ""),
+        node("CACHE-F", "6", "CACHE", ""),
 
     ]
 
@@ -199,25 +222,26 @@ if __name__ == "__main__":
         # init
         lines  = sample_lines()
         nodes  = sample_nodes()
-        colors = sample_colors()
+        line_colors = sample_line_colors()
+        node_colors = sample_node_colors()
 
         # start
         descr = "START DEMO"
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         descr = "traffic change"
         lines = change_line(lines, "CACHE-E", "LV1", "LV2")
         lines = change_line(lines, "CACHE-F", "LV1", "LV2")
         lines = change_line(lines, "RouterY.*RouterC", "LV1", "LV2")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         descr = "traffic change"
         lines = change_line(lines, "CACHE-E", "LV2", "LV3")
         lines = change_line(lines, "CACHE-F", "LV2", "LV3")
         lines = change_line(lines, "RouterY.*RouterC", "LV2", "LV3")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         descr = "traffic change"
@@ -226,7 +250,7 @@ if __name__ == "__main__":
         lines = change_line(lines, "RouterY.*RouterC", "LV3", "LV4")
         lines = change_line(lines, "RouterA.*RouterC", "LV1", "LV2")
         lines = change_line(lines, "PEER-A.*RouterA", "LV1", "LV2")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         descr = "traffic change"
@@ -240,7 +264,7 @@ if __name__ == "__main__":
         lines = change_line(lines, "PEER-C.*RouterA", "LV1", "LV2")
         lines = change_line(lines, "TRANSIT-A.*RouterA", "LV1", "LV2")
         lines = change_line(lines, "TRANSIT-B.*RouterA", "LV1", "LV2")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         descr = "traffic change"
@@ -251,7 +275,7 @@ if __name__ == "__main__":
         lines = change_line(lines, "PEER-A.*RouterA", "LV3", "LV4")
         lines = change_line(lines, "PEER-B.*RouterA", "LV1", "LV3")
         lines = change_line(lines, "PEER-C.*RouterA", "LV2", "LV3")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         descr = "Line RouterC-Y Down !!!"
@@ -259,19 +283,19 @@ if __name__ == "__main__":
         lines = change_line(lines, "RouterY.*RouterC", "2G", "Down")
         lines = change_line(lines, "RouterY.*RouterD", "LV1", "LV5")
         lines = change_line(lines, "RouterC.*RouterD", "LV1", "LV2")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         # delete line
         descr = "Delete line."
         lines = del_line(lines, "Down")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         # add line
         descr = "Add line."
         lines = add_line(lines, "RouterY", "RouterC", "LV1", "1.0", "2G(NEW)", "")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
         # end
@@ -282,7 +306,7 @@ if __name__ == "__main__":
         lines = change_line(lines, "LV.*", "LV2", "LV1")
         lines = change_line(lines, "LV.*", "LV0", "LV1")
         lines = change_line(lines, "Down.*", "Down", "2G")
-        config = template(time(), descr, colors,  nodes, lines)
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
 
