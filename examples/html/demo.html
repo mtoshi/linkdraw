@@ -2,12 +2,15 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="css/style.css">
 <head>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script>!window.jQuery && document.write('<script src="js/jquery-1.10.1.min.js"><\/script>')</script>
 <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+<script>!window.d3 && document.write('<script src="js/d3.v3.min.js"><\/script>')</script>
 <script type="text/javascript" src="js/linkdraw.js"></script>
+<script>!window.linkdraw && document.write('<script src="js/linkdraw.js"><\/script>')</script>
 <script type="text/javascript">
   $(function(){
-     $("#linkdraw").linkDraw({
+     $("#test").linkDraw({
        "configPath": "configs/demo_config.json", 
        "positionPath": "positions/demo_position.json", 
        "positionWriter": "write.cgi",
@@ -27,7 +30,7 @@
   </div>
   
   <div id="container">
-    <div id="linkdraw"></div>
+    <div id="test"></div>
   </div>
   
   <div id="footer">
