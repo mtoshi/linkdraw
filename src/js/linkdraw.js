@@ -1400,6 +1400,9 @@ function updateItem(svg, sysId, configJson) {
   // write line
   updateLine(svg, lineItems);
 
+  // reflect before zoom scale
+  transformView(sysId);
+
 }
 
 (function($) {
@@ -1460,9 +1463,6 @@ function updateItem(svg, sysId, configJson) {
     // draw
     drawItem(svg, sysId);
  
-    // reflect before zoom scale
-    transformView(sysId);
-
     if (sys.interval > 0) {
       setInterval(function() {
         drawItem(svg, sysId);
