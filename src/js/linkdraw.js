@@ -173,12 +173,12 @@ function defaultNodeConfig(name){
 
 function getPosition(name, sysId){
   var position = linkdraw[sysId].position;
-  var width  = linkdraw[sysId].width;
-  var height = linkdraw[sysId].height;
   var p = position[name];
   if (p){
     return p;
   } else {
+    var width  = linkdraw[sysId].width;
+    var height = linkdraw[sysId].height;
     var x = randNum(width);
     var y = randNum(height);
     position[name] = { "x": x, "y": y };
@@ -751,13 +751,12 @@ function delNode(svg, sysId, nodes) {
   }
 }
 
-function modNode(svg, sysId, nodes) {
+function modNode(svg, nodes) {
 
   for (var id in nodes) {
 
     var node = nodes[id];
     var nodeName = node.name;
-    var p = getPosition(nodeName, sysId);
     var r = node.r;
 
     // mod circle
@@ -781,7 +780,7 @@ function modNode(svg, sysId, nodes) {
 function updateNode(svg, sysId, item, drag) {
   addNode(svg, sysId, item.add, drag);
   delNode(svg, sysId, item.del);
-  modNode(svg, sysId, item.mod);
+  modNode(svg, item.mod);
 }
 
 function createSVG(id, sys){
