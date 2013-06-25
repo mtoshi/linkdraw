@@ -737,7 +737,7 @@ function delNode(svg, sysId, nodes) {
 
   for (var id in nodes) {
 
-    var node = node[id];
+    var node = nodes[id];
 
     // del group
     d3.select("g#" + node.groupId).remove();

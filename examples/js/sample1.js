@@ -8,6 +8,6 @@ $(function(){
      //"drag": false,
      "width": 200,
      "height": 200,
-     "interval":0 
+     "interval":0
    });
 });
