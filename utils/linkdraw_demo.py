@@ -220,7 +220,7 @@ if __name__ == "__main__":
     path = sys.argv[1]
   
     n = 10 # iterate 
-    t = 4 # interval
+    t = 9 # interval
 
     count = 0
     while count < n:

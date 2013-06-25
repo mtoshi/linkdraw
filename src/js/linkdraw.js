@@ -1224,6 +1224,11 @@ function dragEvent(sysId) {
       dx = this.cx.baseVal.value + d3.event.dx;
       dy = this.cy.baseVal.value + d3.event.dy;
 
+      // store new position
+      nodeName = nodes[id].name;
+      linkdraw[sysId].position[nodeName].x = dx;
+      linkdraw[sysId].position[nodeName].y = dy;
+
       d3.select(this)
         .attr('cx', dx)
         .attr('cy', dy);
