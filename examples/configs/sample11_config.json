@@ -35,8 +35,8 @@
         { "name": "RouterD", "r": "6", "color": "ROUTER", "link": "" },
         { "name": "RouterE", "r": "6", "color": "ROUTER", "link": "" },
         { "name": "RouterF", "r": "6", "color": "ROUTER", "link": "" },
-        { "name": "RouterX", "r": "6", "color": "ROUTER", "link": "" },
-        { "name": "RouterY", "r": "6", "color": "ROUTER", "link": "" },
+        { "name": "SW-X", "r": "6", "color": "SWITCH", "link": "" },
+        { "name": "SW-Y", "r": "6", "color": "SWITCH", "link": "" },
         { "name": "SW-A", "r": "6", "color": "SWITCH", "link": "" },
         { "name": "SW-B", "r": "6", "color": "SWITCH", "link": "" },
         { "name": "WEB-A", "r": "6", "color":   "SERVER", "link": "" },
@@ -54,9 +54,9 @@
     ],
 
     "lines": [
-        { "source": "TRANSIT-A", "target": "RouterA","color": "LV1", "width": "1", "descr": "10G", "link": "" },
-        { "source": "TRANSIT-B", "target": "RouterA","color": "LV1", "width": "1", "descr": "10G", "link": "" },
-        { "source": "TRANSIT-C", "target": "RouterB","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "TRANSIT-A", "target": "RouterA","color": "LV1", "width": "2.5", "descr": "10G", "link": "" },
+        { "source": "TRANSIT-B", "target": "RouterA","color": "LV1", "width": "2.5", "descr": "10G", "link": "" },
+        { "source": "TRANSIT-C", "target": "RouterB","color": "LV1", "width": "2.5", "descr": "10G", "link": "" },
         { "source": "PEER-A", "target": "RouterA","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "PEER-B", "target": "RouterA","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "PEER-C", "target": "RouterB","color": "LV1", "width": "1", "descr": "1G", "link": "" },
@@ -80,16 +80,15 @@
         { "source": "MAIL-B", "target": "SW-B","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "DNS-A", "target": "SW-A","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "DNS-B", "target": "SW-B","color": "LV1", "width": "1", "descr": "1G", "link": "" },
-        { "source": "RouterX", "target": "RouterC","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
-        { "source": "RouterX", "target": "RouterD","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
-        { "source": "RouterY", "target": "RouterC","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
-        { "source": "RouterY", "target": "RouterD","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
-        { "source": "CACHE-A", "target": "RouterX","color": "LV1", "width": "1", "descr": "1G", "link": "" },
-        { "source": "CACHE-B", "target": "RouterX","color": "LV1", "width": "1", "descr": "1G", "link": "" },
-        { "source": "CACHE-C", "target": "RouterX","color": "LV1", "width": "1", "descr": "1G", "link": "" },
-        { "source": "CACHE-D", "target": "RouterY","color": "LV1", "width": "1", "descr": "1G", "link": "" },
-        { "source": "CACHE-E", "target": "RouterY","color": "LV1", "width": "1", "descr": "1G", "link": "" },
-        { "source": "CACHE-F", "target": "RouterY","color": "LV1", "width": "1", "descr": "1G", "link": "" }
+        { "source": "SW-X", "target": "RouterC","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
+        { "source": "SW-X", "target": "RouterD","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
+        { "source": "SW-Y", "target": "RouterC","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
+        { "source": "SW-Y", "target": "RouterD","color": "LV1", "width": "1.5", "descr": "2G", "link": "" },
+        { "source": "CACHE-A", "target": "SW-X","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "CACHE-B", "target": "SW-X","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "CACHE-C", "target": "SW-X","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "CACHE-D", "target": "SW-Y","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "CACHE-E", "target": "SW-Y","color": "LV1", "width": "1", "descr": "1G", "link": "" },
+        { "source": "CACHE-F", "target": "SW-Y","color": "LV1", "width": "1", "descr": "1G", "link": "" }
     ]
 }
-	

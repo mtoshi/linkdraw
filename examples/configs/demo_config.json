@@ -54,9 +54,9 @@
     ],
 
     "lines": [
-        { "source": "TRANSIT-A", "target": "RouterA","color": "LV1", "width": "1", "descr": "10G", "link": "" },
-        { "source": "TRANSIT-B", "target": "RouterA","color": "LV1", "width": "1", "descr": "10G", "link": "" },
-        { "source": "TRANSIT-C", "target": "RouterB","color": "LV1", "width": "1", "descr": "10G", "link": "" },
+        { "source": "TRANSIT-A", "target": "RouterA","color": "LV1", "width": "2.5", "descr": "10G", "link": "" },
+        { "source": "TRANSIT-B", "target": "RouterA","color": "LV1", "width": "2.5", "descr": "10G", "link": "" },
+        { "source": "TRANSIT-C", "target": "RouterB","color": "LV1", "width": "2.5", "descr": "10G", "link": "" },
         { "source": "PEER-A", "target": "RouterA","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "PEER-B", "target": "RouterA","color": "LV1", "width": "1", "descr": "1G", "link": "" },
         { "source": "PEER-C", "target": "RouterB","color": "LV1", "width": "1", "descr": "1G", "link": "" },
