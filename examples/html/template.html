@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="css/style.css">
+<head>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script>!window.jQuery && document.write('<script src="js/jquery.min.js"><\/script>')</script>
+<script src="http://code.linkdraw.org/d3/d3-3.1.10.min.js"></script>
+<script>!window.d3 && document.write('<script src="js/d3.min.js"><\/script>')</script>
+<script src="http://code.linkdraw.org/linkdraw.js"></script>
+<script>!window.linkdraw && document.write('<script src="js/linkdraw.js"><\/script>')</script>
+<script>
+  $(function(){
+     $("#template").linkDraw({
+       "configPath": "configs/template_config.json", 
+       "positionPath": "positions/template_position.json", 
+       "positionWriter": "write.cgi",
+       //"positionSave": false,
+       "width": 600,
+       "height": 400,
+       "interval": 500
+     });
+  });
+</script>
+<title>Linkdraw</title>
+</head>
+<body>
+
+  <div id="header">
+    <h1>Linkdraw</h1>
+  </div>
+  
+  <div id="container">
+    <div id="template"></div>
+  </div>
+  
+  <div id="footer">
+    <p><a href="https://github.com/mtoshi/linkdraw">Linkdraw</a></p>
+  </div>
+
+</body>
+</html>

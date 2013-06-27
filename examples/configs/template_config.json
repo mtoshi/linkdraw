@@ -1,0 +1,7 @@
+{
+    "lines": [
+        { "source": "A", "target": "B","color": "", "width": "1", "descr": "", "link": "" },
+        { "source": "B", "target": "C","color": "", "width": "1", "descr": "", "link": "" },
+        { "source": "C", "target": "A","color": "", "width": "1", "descr": "", "link": "" }
+    ]
+}
