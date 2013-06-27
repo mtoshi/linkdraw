@@ -20,7 +20,7 @@
 
     "nodes": [
 
-        { "name": "Internet", "r": "12", "color": "#4682B4", "link": "" },
+        { "name": "Internet", "r": "12", "color": "#4682B4", "link": "http://en.wikipedia.org/wiki/Internet" },
 
         { "name": "A1",    "r": "4", "color": "DC_A", "link": "" },
         { "name": "A2",    "r": "4", "color": "DC_A", "link": "" },

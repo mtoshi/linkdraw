@@ -737,7 +737,7 @@ function delNode(svg, sysId, nodes) {
 
   for (var id in nodes) {
 
-    var node = node[id];
+    var node = nodes[id];
 
     // del group
     d3.select("g#" + node.groupId).remove();
@@ -1223,6 +1223,11 @@ function dragEvent(sysId) {
 
       dx = this.cx.baseVal.value + d3.event.dx;
       dy = this.cy.baseVal.value + d3.event.dy;
+
+      // store new position
+      nodeName = nodes[id].name;
+      linkdraw[sysId].position[nodeName].x = dx;
+      linkdraw[sysId].position[nodeName].y = dy;
 
       d3.select(this)
         .attr('cx', dx)

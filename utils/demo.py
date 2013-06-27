@@ -108,8 +108,8 @@ def sample_nodes():
         node("RouterE", "6", "ROUTER", ""),
         node("RouterF", "6", "ROUTER", ""),
 
-        node("RouterX", "6", "ROUTER", ""),
-        node("RouterY", "6", "ROUTER", ""),
+        node("SW-X", "6", "SWITCH", ""),
+        node("SW-Y", "6", "SWITCH", ""),
 
         node("SW-A", "6", "SWITCH", ""),
         node("SW-B", "6", "SWITCH", ""),
@@ -135,9 +135,9 @@ def sample_nodes():
 def sample_lines():
     return [
 
-        line("TRANSIT-A", "RouterA", "LV1", "1", "10G", ""),
-        line("TRANSIT-B", "RouterA", "LV1", "1", "10G", ""),
-        line("TRANSIT-C", "RouterB", "LV1", "1", "10G", ""),
+        line("TRANSIT-A", "RouterA", "LV1", "2.5", "10G", ""),
+        line("TRANSIT-B", "RouterA", "LV1", "2.5", "10G", ""),
+        line("TRANSIT-C", "RouterB", "LV1", "2.5", "10G", ""),
 
         line("PEER-A", "RouterA", "LV1", "1", "1G", ""),
         line("PEER-B", "RouterA", "LV1", "1", "1G", ""),
@@ -169,17 +169,17 @@ def sample_lines():
         line("DNS-A", "SW-A", "LV1", "1", "1G", ""),
         line("DNS-B", "SW-B", "LV1", "1", "1G", ""),
 
-        line("RouterX", "RouterC", "LV1", "1.5", "2G", ""),
-        line("RouterX", "RouterD", "LV1", "1.5", "2G", ""),
-        line("RouterY", "RouterC", "LV1", "1.5", "2G", ""),
-        line("RouterY", "RouterD", "LV1", "1.5", "2G", ""),
+        line("SW-X", "RouterC", "LV1", "1.5", "2G", ""),
+        line("SW-X", "RouterD", "LV1", "1.5", "2G", ""),
+        line("SW-Y", "RouterC", "LV1", "1.5", "2G", ""),
+        line("SW-Y", "RouterD", "LV1", "1.5", "2G", ""),
 
-        line("CACHE-A", "RouterX", "LV1", "1", "1G", ""),
-        line("CACHE-B", "RouterX", "LV1", "1", "1G", ""),
-        line("CACHE-C", "RouterX", "LV1", "1", "1G", ""),
-        line("CACHE-D", "RouterY", "LV1", "1", "1G", ""),
-        line("CACHE-E", "RouterY", "LV1", "1", "1G", ""),
-        line("CACHE-F", "RouterY", "LV1", "1", "1G", ""),
+        line("CACHE-A", "SW-X", "LV1", "1", "1G", ""),
+        line("CACHE-B", "SW-X", "LV1", "1", "1G", ""),
+        line("CACHE-C", "SW-X", "LV1", "1", "1G", ""),
+        line("CACHE-D", "SW-Y", "LV1", "1", "1G", ""),
+        line("CACHE-E", "SW-Y", "LV1", "1", "1G", ""),
+        line("CACHE-F", "SW-Y", "LV1", "1", "1G", ""),
 
     ]
 
@@ -205,9 +205,14 @@ def add_line(lines, source, target, color, width, descr, link):
     lines.append(_line)
     return lines
 
+def add_node(nodes, name, r, color, link):
+    _node = node(name, r, color, link)
+    nodes.append(_node)
+    return nodes
+
 def update(path, config, t):
     write_file(path, config)
-    sleep(n)
+    sleep(t)
 
 
 if __name__ == "__main__":
@@ -215,9 +220,12 @@ if __name__ == "__main__":
     path = sys.argv[1]
   
     n = 10 # iterate 
-    t = 12 # interval
+    t = 9 # interval
 
-    for i in range(n):
+    count = 0
+    while count < n:
+
+        count += 1
 
         # init
         lines  = sample_lines()
@@ -230,35 +238,35 @@ if __name__ == "__main__":
         config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
-        descr = "traffic change"
+        descr = "Traffic change."
         lines = change_line(lines, "CACHE-E", "LV1", "LV2")
         lines = change_line(lines, "CACHE-F", "LV1", "LV2")
-        lines = change_line(lines, "RouterY.*RouterC", "LV1", "LV2")
+        lines = change_line(lines, "SW-Y.*RouterC", "LV1", "LV2")
         config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
-        descr = "traffic change"
+        descr = "Traffic change."
         lines = change_line(lines, "CACHE-E", "LV2", "LV3")
         lines = change_line(lines, "CACHE-F", "LV2", "LV3")
-        lines = change_line(lines, "RouterY.*RouterC", "LV2", "LV3")
+        lines = change_line(lines, "SW-Y.*RouterC", "LV2", "LV3")
         config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
-        descr = "traffic change"
+        descr = "Traffic change."
         lines = change_line(lines, "CACHE-E", "LV3", "LV4")
         lines = change_line(lines, "CACHE-F", "LV3", "LV4")
-        lines = change_line(lines, "RouterY.*RouterC", "LV3", "LV4")
+        lines = change_line(lines, "SW-Y.*RouterC", "LV3", "LV4")
         lines = change_line(lines, "RouterA.*RouterC", "LV1", "LV2")
         lines = change_line(lines, "PEER-A.*RouterA", "LV1", "LV2")
         config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
-        descr = "traffic change"
+        descr = "Traffic change."
         lines = change_line(lines, "CACHE-A", "LV1", "LV3")
         lines = change_line(lines, "CACHE-B", "LV1", "LV3")
         lines = change_line(lines, "CACHE-E", "LV4", "LV5")
         lines = change_line(lines, "CACHE-F", "LV4", "LV5")
-        lines = change_line(lines, "RouterY.*RouterC", "LV4", "LV5")
+        lines = change_line(lines, "SW-Y.*RouterC", "LV4", "LV5")
         lines = change_line(lines, "RouterA.*RouterC", "LV2", "LV3")
         lines = change_line(lines, "PEER-A.*RouterA", "LV2", "LV3")
         lines = change_line(lines, "PEER-C.*RouterA", "LV1", "LV2")
@@ -267,11 +275,11 @@ if __name__ == "__main__":
         config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
 
-        descr = "traffic change"
+        descr = "Traffic change."
         lines = change_line(lines, "CACHE-A", "LV3", "LV5")
         lines = change_line(lines, "CACHE-B", "LV3", "LV5")
         lines = change_line(lines, "CACHE-C", "LV1", "LV4")
-        lines = change_line(lines, "RouterX.*RouterC", "LV1", "LV5")
+        lines = change_line(lines, "SW-X.*RouterC", "LV1", "LV5")
         lines = change_line(lines, "PEER-A.*RouterA", "LV3", "LV4")
         lines = change_line(lines, "PEER-B.*RouterA", "LV1", "LV3")
         lines = change_line(lines, "PEER-C.*RouterA", "LV2", "LV3")
@@ -279,9 +287,9 @@ if __name__ == "__main__":
         update(path, config, t)
 
         descr = "Line RouterC-Y Down !!!"
-        lines = change_line(lines, "RouterY.*RouterC", "LV5", "LV0")
-        lines = change_line(lines, "RouterY.*RouterC", "2G", "Down")
-        lines = change_line(lines, "RouterY.*RouterD", "LV1", "LV5")
+        lines = change_line(lines, "SW-Y.*RouterC", "LV5", "LV0")
+        lines = change_line(lines, "SW-Y.*RouterC", "2G", "Down")
+        lines = change_line(lines, "SW-Y.*RouterD", "LV1", "LV5")
         lines = change_line(lines, "RouterC.*RouterD", "LV1", "LV2")
         config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
@@ -294,9 +302,86 @@ if __name__ == "__main__":
 
         # add line
         descr = "Add line."
-        lines = add_line(lines, "RouterY", "RouterC", "LV1", "1.0", "2G(NEW)", "")
+        lines = add_line(lines, "SW-Y", "RouterC", "LV1", "1.0", "2G(NEW)", "")
         config = template(time(), descr, node_colors, line_colors,  nodes, lines)
         update(path, config, t)
+
+        # add node
+        descr = "Add node. SW-Z"
+        nodes = add_node(nodes, "SW-Z", "6", "SWITCH", "")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # add line
+        descr = "Add line."
+        lines = add_line(lines, "SW-Z", "RouterC", "LV0", "1.0", "2G", "")
+        lines = add_line(lines, "SW-Z", "RouterD", "LV0", "1.0", "2G", "")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # add node
+        descr = "Add node. WEB-Z"
+        nodes = add_node(nodes, "WEB-Z", "6", "SERVER", "")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # add node
+        descr = "Add node. DNS-Z"
+        nodes = add_node(nodes, "DNS-Z", "6", "SERVER", "")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # add node
+        descr = "Add node. MAIL-Z"
+        nodes = add_node(nodes, "MAIL-Z", "6", "SERVER", "")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # add line
+        descr = "Add line."
+        lines = add_line(lines, "WEB-Z", "SW-Z", "LV0", "1.0", "1G", "")
+        lines = add_line(lines, "DNS-Z", "SW-Z", "LV0", "1.0", "1G", "")
+        lines = add_line(lines, "MAIL-Z", "SW-Z", "LV0", "1.0", "1G", "")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # Change line color
+        descr = "Traffic change."
+        lines = change_line(lines, "SW-Z", "LV0", "LV1")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # Change line color
+        descr = "Traffic change."
+        lines = change_line(lines, "WEB-Z.*SW-Z", "LV1", "LV3")
+        lines = change_line(lines, "SW-Z.*RouterC", "LV1", "LV3")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # Change line color
+        descr = "Traffic change."
+        lines = change_line(lines, "WEB-Z.*SW-Z", "LV3", "LV4")
+        lines = change_line(lines, "DNS-Z.*SW-Z", "LV1", "LV3")
+        lines = change_line(lines, "MAIL-Z.*SW-Z", "LV1", "LV3")
+        lines = change_line(lines, "SW-Z.*RouterC", "LV3", "LV4")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t)
+
+        # Change line color
+        descr = "Line down RouterA - RouterC"
+        lines = change_line(lines, "RouterA.*RouterC", "LV3", "LV0")
+        lines = change_line(lines, "RouterA.*RouterC", "10G", "Down")
+        lines = change_line(lines, "RouterB.*RouterD", "LV1", "LV3")
+        lines = change_line(lines, "RouterC.*RouterD", "LV2", "LV1")
+        lines = change_line(lines, "RouterA.*RouterB", "LV1", "LV3")
+        lines = change_line(lines, "PEER-C.*RouterA" , "LV3", "LV1")
+        lines = change_line(lines, "PEER-C.*RouterB" , "LV1", "LV3")
+        lines = change_line(lines, "SW-X.*RouterC", "LV5", "LV1")
+        lines = change_line(lines, "SW-X.*RouterD", "LV1", "LV5")
+        lines = change_line(lines, "SW-Z.*RouterC", "LV4", "LV1")
+        lines = change_line(lines, "SW-Z.*RouterD", "LV1", "LV4")
+        config = template(time(), descr, node_colors, line_colors,  nodes, lines)
+        update(path, config, t*4)
 
         # end
         descr = "END"

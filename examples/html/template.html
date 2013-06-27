@@ -10,14 +10,14 @@
 <script>!window.linkdraw && document.write('<script src="js/linkdraw.js"><\/script>')</script>
 <script>
   $(function(){
-     $("#test").linkDraw({
-       "configPath": "configs/demo_config.json", 
-       "positionPath": "positions/demo_position.json", 
+     $("#template").linkDraw({
+       "configPath": "configs/template_config.json", 
+       "positionPath": "positions/template_position.json", 
        "positionWriter": "write.cgi",
-       "positionSave": false,
-       "width": 1200,
-       "height": 600,
-       "interval": 10
+       //"positionSave": false,
+       "width": 600,
+       "height": 400,
+       "interval": 300
      });
   });
 </script>
@@ -30,7 +30,7 @@
   </div>
   
   <div id="container">
-    <div id="test"></div>
+    <div id="template"></div>
   </div>
   
   <div id="footer">
